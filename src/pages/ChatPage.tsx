@@ -157,7 +157,7 @@ const handleSendImageMessage = async (
         <ChatHeader person={person} />
 
         <section className="messages">
-          <div className="conversation-intro">
+          {/* <div className="conversation-intro">
             <div className="avatar avatar-large">
               {person.photoUrl ? (
                 <img src={person.photoUrl} alt={person.name} />
@@ -170,7 +170,7 @@ const handleSendImageMessage = async (
 
             <strong>{person.name}</strong>
             <span>{person.status || 'Active now'}</span>
-          </div>
+          </div> */}
 
           <div className="message-list">
             {conversationMessages.map((message) => (
