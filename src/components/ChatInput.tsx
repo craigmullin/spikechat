@@ -97,13 +97,13 @@ export function ChatInput({
       )}
 
       <div className="chat-input-area">
-        <button
+        {/* <button
           type="button"
           className="composer-action-button"
           aria-label="More options"
         >
           <Plus size={25} />
-        </button>
+        </button> */}
 
         <button
           type="button"
@@ -139,13 +139,13 @@ export function ChatInput({
             disabled={Boolean(pendingImage)}
           />
 
-          <button
+          {/* <button
             type="button"
             className="emoji-button"
             aria-label="Choose emoji"
           >
             <Smile size={23} />
-          </button>
+          </button> */}
         </div>
 
         <div

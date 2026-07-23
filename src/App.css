@@ -218,7 +218,7 @@ button {
 .message-bubble {
   max-width: 82%;
   padding: 10px 16px;
-  border-radius: 24px;
+  border-radius: 15px;
   color: white;
   font-size: clamp(16px, 4.5vw, 19px);
   line-height: 1.25;
@@ -229,12 +229,12 @@ button {
 
 .message-row.sent .message-bubble {
   background: var(--color-sent-bubble, #1688f8);
-  border-radius: 24px;
+  border-radius: 15px;
 }
 
 .message-row.received .message-bubble {
   background: var(--color-received-bubble, #333333);
-  border-radius: 24px;
+  border-radius: 15px;
 }
 
 .message-row.sent + .message-row.sent,
@@ -245,7 +245,7 @@ button {
 .image-message {
   max-width: 82%;
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 15px;
   background: #333;
 }
 
