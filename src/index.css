@@ -8,23 +8,61 @@
     "Segoe UI",
     sans-serif;
 
-  color: white;
-  background: #111216;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Google Messages-inspired dark theme */
+  --color-background: #0f1419;
+  --color-surface: #171c22;
+  --color-surface-raised: #20262d;
+  --color-surface-hover: #293038;
+
+  --color-border: #30363d;
+
+  --color-text: #f1f3f4;
+  --color-text-secondary: #9aa0a6;
+
+  --color-primary: #8ab4f8;
+  --color-primary-strong: #669df6;
+  --color-on-primary: #0b1f33;
+
+  --color-sent-bubble: #004a77;
+  --color-received-bubble: #30363d;
+
+  --color-danger: #f28b82;
+  --color-danger-background: #3c2022;
+
+  color: var(--color-text);
+  background: var(--color-background);
 }
 
 html,
 body,
 #root {
   margin: 0;
+  width: 100%;
   min-width: 320px;
   min-height: 100%;
 }
 
+html {
+  background: var(--color-background);
+}
+
 body {
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }

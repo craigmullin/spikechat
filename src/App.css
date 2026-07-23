@@ -50,7 +50,10 @@ button {
 }
 
 .icon-button,
-.emoji-button,
+.emoji-button {
+  color: var(--color-primary);
+}
+
 .send-button {
   width: 38px;
   height: 38px;
@@ -130,8 +133,15 @@ button {
 
 .messages {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 20px 12px 100px;
+  overscroll-behavior: contain;
+  padding: 16px 10px 18px;
+  scrollbar-width: none;
+}
+
+.messages::-webkit-scrollbar {
+  display: none;
 }
 
 .conversation-intro {
@@ -180,27 +190,32 @@ button {
 }
 
 .message-row.sent .message-bubble {
-  background: #7c3aed;
-  color: white;
+  background: var(--color-sent-bubble);
+  color: var(--color-text);
   border-bottom-right-radius: 6px;
 }
 
 .message-row.received .message-bubble {
-  background: #303238;
-  color: white;
+  background: var(--color-received-bubble);
+  color: var(--color-text);
   border-bottom-left-radius: 6px;
 }
 
 .chat-input-area {
-  min-height: 62px;
-  padding: 8px 10px max(8px, env(safe-area-inset-bottom));
-  border-top: 1px solid #2b2d33;
-  background: #111216;
+  flex-shrink: 0;
+  min-height: 58px;
+  padding:
+    7px
+    8px
+    max(7px, env(safe-area-inset-bottom));
+
+  border-top: 1px solid var(--color-border);
+  background: var(--color-background);
+
   display: flex;
   align-items: center;
-  gap: 4px;
-  position: sticky;
-  bottom: 0;
+  gap: 3px;
+
   z-index: 10;
 }
 
@@ -240,8 +255,8 @@ button {
 }
 
 .send-button {
-  background: #7c3aed;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   width: 38px;
   height: 38px;
 }
@@ -321,27 +336,6 @@ button {
   cursor: pointer;
 }
 
-@media (min-width: 700px) {
-  .app-shell {
-    padding: 24px;
-  }
-
-  .chat-card {
-    min-height: calc(100vh - 48px);
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-  }
-
-  .screen-shell {
-  width: 100%;
-  max-width: 520px;
-  min-height: 100vh;
-  margin: 0 auto;
-  background: #111216;
-  color: white;
-}
-
 .screen-header {
   min-height: 84px;
   padding: 18px 18px 14px;
@@ -362,19 +356,24 @@ button {
 }
 
 .eyebrow {
-  color: #9d76ff;
+  color: var(--color-primary);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
+.primary-button {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
 .primary-icon-button {
   width: 44px;
   height: 44px;
   border-radius: 999px;
-  background: #7c3aed;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   display: grid;
   place-items: center;
   text-decoration: none;
@@ -444,7 +443,7 @@ button {
 .person-card {
   padding: 12px;
   border-radius: 16px;
-  background: #1c1e23;
+  background: var(--color-surface);
   color: white;
   display: flex;
   align-items: center;
@@ -453,7 +452,7 @@ button {
 }
 
 .person-card:hover {
-  background: #24262d;
+  background: var(--color-surface-hover);
 }
 
 .avatar-list {
@@ -495,6 +494,20 @@ button {
   width: 104px;
   height: 104px;
   font-size: 38px;
+}
+
+.composer-field {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.person-form input {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.person-form input:focus {
+  border-color: var(--color-primary);
 }
 
 .person-form label {
@@ -740,4 +753,57 @@ button {
   place-items: center;
   color: #9fa2aa;
   font-size: 13px;
-}}
+}
+.app-shell {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--color-background);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.chat-card {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  background: var(--color-background);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+@media (min-width: 700px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    height: auto;
+    padding: 24px;
+    background:
+      radial-gradient(
+        circle at top,
+        var(--color-surface-raised),
+        var(--color-background) 55%
+      );
+  }
+
+  .chat-card,
+  .screen-shell {
+    width: 100%;
+    max-width: 520px;
+    height: calc(100vh - 48px);
+    height: calc(100dvh - 48px);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  }
+
+  .screen-shell {
+    margin: 24px auto;
+  }
+}
