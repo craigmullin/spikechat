@@ -1,4 +1,4 @@
-import { Image, Plus, Send, Smile, X } from 'lucide-react'
+import { Image, Send, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import type { MessageDirection } from '../types'
