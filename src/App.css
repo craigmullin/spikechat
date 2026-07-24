@@ -815,6 +815,18 @@ button {
   color: #b5b7bf;
   cursor: pointer;
 }
+.message-row,
+.image-message,
+.image-message img {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.image-message img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
 
 @media (max-width: 390px) {
   .messages {
