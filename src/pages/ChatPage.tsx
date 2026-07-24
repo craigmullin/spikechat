@@ -1,10 +1,11 @@
-import { Copy, Pencil, Trash2, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { Copy, Crop, Pencil, Trash2, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { ChatHeader } from '../components/ChatHeader'
 import { ChatInput } from '../components/ChatInput'
 import { MessageBubble } from '../components/MessageBubble'
-import { deleteMedia, saveMedia } from '../mediaDb'
+import { ImageCropper } from '../components/ImageCropper'
+import { deleteMedia, loadMedia, saveMedia } from '../mediaDb'
 import {
   loadMessages,
   loadPeople,
@@ -28,6 +29,8 @@ export function ChatPage() {
     useState<Message | null>(null)
 
   const [editingText, setEditingText] = useState('')
+  const [imageEditUrl, setImageEditUrl] = useState<string | null>(null)
+  const replaceImageInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     saveMessages(messages)
@@ -90,6 +93,8 @@ const handleSendImageMessage = async (
   }
 
   const closeMessageOptions = () => {
+    if (imageEditUrl) URL.revokeObjectURL(imageEditUrl)
+    setImageEditUrl(null)
     setSelectedMessage(null)
     setEditingText('')
   }
@@ -135,19 +140,57 @@ const handleSendImageMessage = async (
     closeMessageOptions()
     }
 
-  const handleDuplicate = () => {
+  const handleDuplicate = async () => {
     if (!selectedMessage) {
       return
+    }
+
+    let mediaId = selectedMessage.mediaId
+    if (selectedMessage.type === 'image' && selectedMessage.mediaId) {
+      const blob = await loadMedia(selectedMessage.mediaId)
+      if (!blob) return
+
+      mediaId = crypto.randomUUID()
+      await saveMedia(mediaId, blob)
     }
 
     const duplicate: Message = {
       ...selectedMessage,
       id: crypto.randomUUID(),
+      mediaId,
       createdAt: Date.now(),
     }
 
     setMessages((current) => [...current, duplicate])
 
+    closeMessageOptions()
+  }
+
+  const beginImageEdit = async (file?: File) => {
+    if (!selectedMessage?.mediaId) return
+
+    const blob = file ?? (await loadMedia(selectedMessage.mediaId))
+    if (!blob) return
+
+    if (imageEditUrl) URL.revokeObjectURL(imageEditUrl)
+    setImageEditUrl(URL.createObjectURL(blob))
+  }
+
+  const finishImageEdit = async (blob: Blob) => {
+    if (!selectedMessage?.mediaId) return
+
+    const previousMediaId = selectedMessage.mediaId
+    const nextMediaId = crypto.randomUUID()
+
+    await saveMedia(nextMediaId, blob)
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === selectedMessage.id
+          ? { ...message, mediaId: nextMediaId }
+          : message,
+      ),
+    )
+    await deleteMedia(previousMediaId)
     closeMessageOptions()
   }
 
@@ -189,7 +232,7 @@ const handleSendImageMessage = async (
         />
       </main>
 
-      {selectedMessage && selectedMessage.type === 'text' && (
+      {selectedMessage && (
         <div
           className="message-options-backdrop"
           onClick={closeMessageOptions}
@@ -214,6 +257,8 @@ const handleSendImageMessage = async (
               </button>
             </div>
 
+            {selectedMessage.type === 'text' ? (
+              <>
             <textarea
               className="message-edit-textarea"
               value={editingText}
@@ -232,6 +277,38 @@ const handleSendImageMessage = async (
               <Pencil size={18} />
               Save Changes
             </button>
+              </>
+            ) : (
+              <>
+                <input
+                  ref={replaceImageInput}
+                  className="hidden-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0]
+                    if (file) void beginImageEdit(file)
+                    event.target.value = ''
+                  }}
+                />
+                <button
+                  type="button"
+                  className="primary-button full-width-button"
+                  onClick={() => void beginImageEdit()}
+                >
+                  <Crop size={18} />
+                  Crop Image
+                </button>
+                <button
+                  type="button"
+                  className="secondary-action-button"
+                  onClick={() => replaceImageInput.current?.click()}
+                >
+                  <Crop size={18} />
+                  Replace & Crop
+                </button>
+              </>
+            )}
 
             {selectedMessage && selectedMessage.type === 'text' && (
             <button
@@ -254,6 +331,17 @@ const handleSendImageMessage = async (
             </button>
           </div>
         </div>
+      )}
+
+      {imageEditUrl && (
+        <ImageCropper
+          imageUrl={imageEditUrl}
+          onCancel={() => {
+            URL.revokeObjectURL(imageEditUrl)
+            setImageEditUrl(null)
+          }}
+          onComplete={(blob) => void finishImageEdit(blob)}
+        />
       )}
     </div>
   )

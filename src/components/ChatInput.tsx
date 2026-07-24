@@ -2,6 +2,7 @@ import { Image, Send, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import type { MessageDirection } from '../types'
+import { ImageCropper } from './ImageCropper'
 
 interface ChatInputProps {
   onSendTextMessage: (
@@ -24,6 +25,10 @@ export function ChatInput({
     file: File
     previewUrl: string
   } | null>(null)
+  const [cropSource, setCropSource] = useState<{
+    file: File
+    url: string
+  } | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -36,16 +41,36 @@ export function ChatInput({
       return
     }
 
-    if (pendingImage) {
-      URL.revokeObjectURL(pendingImage.previewUrl)
-    }
-
-    setPendingImage({
+    setCropSource({
       file,
-      previewUrl: URL.createObjectURL(file),
+      url: URL.createObjectURL(file),
     })
 
     event.target.value = ''
+  }
+
+  const cancelCrop = () => {
+    if (cropSource) URL.revokeObjectURL(cropSource.url)
+    setCropSource(null)
+  }
+
+  const completeCrop = (blob: Blob) => {
+    if (!cropSource) return
+
+    if (pendingImage) URL.revokeObjectURL(pendingImage.previewUrl)
+
+    const croppedFile = new File(
+      [blob],
+      cropSource.file.name.replace(/\.[^.]+$/, '') + '-cropped.jpg',
+      { type: blob.type },
+    )
+
+    URL.revokeObjectURL(cropSource.url)
+    setCropSource(null)
+    setPendingImage({
+      file: croppedFile,
+      previewUrl: URL.createObjectURL(croppedFile),
+    })
   }
 
   const clearPendingImage = () => {
@@ -78,6 +103,13 @@ export function ChatInput({
 
   return (
     <div className="composer-wrapper">
+      {cropSource && (
+        <ImageCropper
+          imageUrl={cropSource.url}
+          onCancel={cancelCrop}
+          onComplete={completeCrop}
+        />
+      )}
       {pendingImage && (
         <div className="composer-image-preview">
           <img
