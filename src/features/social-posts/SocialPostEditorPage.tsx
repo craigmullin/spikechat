@@ -1,4 +1,4 @@
-import { ArrowLeft, Camera, Save } from 'lucide-react'
+import { ArrowLeft, BookmarkPlus, Camera, Save, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -12,6 +12,13 @@ import type { ImagePurpose } from '../media/imageProcessing'
 import { loadSocialPost, loadSocialPosts, saveSocialPost } from './socialPostRepository'
 import type { InstagramPost, RedditPost, SocialPlatform, SocialPost, Theme } from './types'
 import { formatComments, parseComments } from './fictionalComments'
+import {
+  clearSocialPostDefaults,
+  loadInstagramDefaults,
+  loadRedditDefaults,
+  saveInstagramDefaults,
+  saveRedditDefaults,
+} from './socialPostDefaults'
 
 interface CropJob {
   url: string
@@ -67,45 +74,52 @@ export function SocialPostEditorPage() {
   const [params] = useSearchParams()
   const existing = useMemo(() => postId ? loadSocialPost(postId) : undefined, [postId])
   const platform = (existing?.platform ?? (params.get('platform') === 'reddit' ? 'reddit' : 'instagram')) as SocialPlatform
+  const instagramDefaults = useMemo(loadInstagramDefaults, [])
+  const redditDefaults = useMemo(loadRedditDefaults, [])
   const people = useMemo(() => loadPeople(), [])
   const now = new Date().toISOString()
-  const [theme, setTheme] = useState<Theme>(existing?.theme ?? 'dark')
+  const [theme, setTheme] = useState<Theme>(
+    existing?.theme ??
+    (platform === 'instagram' ? instagramDefaults.theme : redditDefaults.theme) ??
+    'dark',
+  )
   const [cropJob, setCropJob] = useState<CropJob>()
   const [mediaError, setMediaError] = useState('')
+  const [defaultsMessage, setDefaultsMessage] = useState('')
   const pendingMedia = useRef(new Set<string>())
   const saved = useRef(false)
 
   const instagramExisting = existing?.platform === 'instagram' ? existing : undefined
   const [instagramPersonId, setInstagramPersonId] = useState(instagramExisting?.personId ?? '')
-  const [handle, setHandle] = useState(instagramExisting?.handle ?? '')
-  const [displayName, setDisplayName] = useState(instagramExisting?.displayName ?? '')
+  const [handle, setHandle] = useState(instagramExisting?.handle ?? instagramDefaults.handle ?? '')
+  const [displayName, setDisplayName] = useState(instagramExisting?.displayName ?? instagramDefaults.displayName ?? '')
   const [instagramProfileId, setInstagramProfileId] = useState(instagramExisting?.profileMediaId)
   const [instagramProfileUrl, setInstagramProfileUrl] = useState(instagramExisting?.profileImageUrl)
   const [instagramMainId, setInstagramMainId] = useState(instagramExisting?.mainMediaId)
   const [instagramCarouselIds, setInstagramCarouselIds] = useState(instagramExisting?.carouselMediaIds ?? [])
   const [instagramCommentText, setInstagramCommentText] = useState(formatComments(instagramExisting?.comments))
   const [caption, setCaption] = useState(instagramExisting?.caption ?? '')
-  const [location, setLocation] = useState(instagramExisting?.location ?? '')
-  const [music, setMusic] = useState(instagramExisting?.musicLabel ?? '')
-  const [displayedDate, setDisplayedDate] = useState(instagramExisting?.displayedDate ?? 'Today')
-  const [likes, setLikes] = useState(instagramExisting?.likeCount ?? '0')
-  const [instagramComments, setInstagramComments] = useState(instagramExisting?.commentCount ?? '0')
-  const [reposts, setReposts] = useState(instagramExisting?.repostCount ?? '0')
-  const [sends, setSends] = useState(instagramExisting?.sendCount ?? '0')
-  const [savedPost, setSavedPost] = useState(instagramExisting?.isSaved ?? false)
-  const [verified, setVerified] = useState(instagramExisting?.isVerified ?? false)
-  const [showHeader, setShowHeader] = useState(instagramExisting?.showHeader ?? true)
-  const [showFollow, setShowFollow] = useState(instagramExisting?.showFollowButton ?? true)
-  const [showEngagement, setShowEngagement] = useState(instagramExisting?.showEngagement ?? true)
-  const [showCaption, setShowCaption] = useState(instagramExisting?.showCaption ?? true)
-  const [showDate, setShowDate] = useState(instagramExisting?.showDate ?? true)
-  const [showMusic, setShowMusic] = useState(instagramExisting?.showMusic ?? true)
+  const [location, setLocation] = useState(instagramExisting?.location ?? instagramDefaults.location ?? '')
+  const [music, setMusic] = useState(instagramExisting?.musicLabel ?? instagramDefaults.music ?? '')
+  const [displayedDate, setDisplayedDate] = useState(instagramExisting?.displayedDate ?? instagramDefaults.displayedDate ?? 'Today')
+  const [likes, setLikes] = useState(instagramExisting?.likeCount ?? instagramDefaults.likes ?? '0')
+  const [instagramComments, setInstagramComments] = useState(instagramExisting?.commentCount ?? instagramDefaults.comments ?? '0')
+  const [reposts, setReposts] = useState(instagramExisting?.repostCount ?? instagramDefaults.reposts ?? '0')
+  const [sends, setSends] = useState(instagramExisting?.sendCount ?? instagramDefaults.sends ?? '0')
+  const [savedPost, setSavedPost] = useState(instagramExisting?.isSaved ?? instagramDefaults.savedPost ?? false)
+  const [verified, setVerified] = useState(instagramExisting?.isVerified ?? instagramDefaults.verified ?? false)
+  const [showHeader, setShowHeader] = useState(instagramExisting?.showHeader ?? instagramDefaults.showHeader ?? true)
+  const [showFollow, setShowFollow] = useState(instagramExisting?.showFollowButton ?? instagramDefaults.showFollow ?? true)
+  const [showEngagement, setShowEngagement] = useState(instagramExisting?.showEngagement ?? instagramDefaults.showEngagement ?? true)
+  const [showCaption, setShowCaption] = useState(instagramExisting?.showCaption ?? instagramDefaults.showCaption ?? true)
+  const [showDate, setShowDate] = useState(instagramExisting?.showDate ?? instagramDefaults.showDate ?? true)
+  const [showMusic, setShowMusic] = useState(instagramExisting?.showMusic ?? instagramDefaults.showMusic ?? true)
 
   const redditExisting = existing?.platform === 'reddit' ? existing : undefined
   const [redditPersonId, setRedditPersonId] = useState(redditExisting?.personId ?? '')
-  const [subreddit, setSubreddit] = useState(redditExisting?.subreddit ?? '')
-  const [communitySubtitle, setCommunitySubtitle] = useState(redditExisting?.communitySubtitle ?? '')
-  const [username, setUsername] = useState(redditExisting?.username ?? '')
+  const [subreddit, setSubreddit] = useState(redditExisting?.subreddit ?? redditDefaults.subreddit ?? '')
+  const [communitySubtitle, setCommunitySubtitle] = useState(redditExisting?.communitySubtitle ?? redditDefaults.communitySubtitle ?? '')
+  const [username, setUsername] = useState(redditExisting?.username ?? redditDefaults.username ?? '')
   const [redditCommunityId, setRedditCommunityId] = useState(redditExisting?.subredditMediaId)
   const [redditUserId, setRedditUserId] = useState(redditExisting?.userMediaId)
   const [redditUserUrl, setRedditUserUrl] = useState(redditExisting?.userImageUrl)
@@ -113,35 +127,35 @@ export function SocialPostEditorPage() {
   const [redditCommentText, setRedditCommentText] = useState(formatComments(redditExisting?.comments))
   const [title, setTitle] = useState(redditExisting?.title ?? '')
   const [body, setBody] = useState(redditExisting?.body ?? '')
-  const [age, setAge] = useState(redditExisting?.ageLabel ?? 'now')
-  const [flair, setFlair] = useState(redditExisting?.postFlair?.text ?? '')
-  const [flairBackground, setFlairBackground] = useState(redditExisting?.postFlair?.backgroundColor ?? '#e72678')
-  const [flairTextColor, setFlairTextColor] = useState(redditExisting?.postFlair?.textColor ?? '#ffffff')
-  const [votes, setVotes] = useState(redditExisting?.voteCount ?? '0')
-  const [redditComments, setRedditComments] = useState(redditExisting?.commentCount ?? '0')
-  const [redditReposts, setRedditReposts] = useState(redditExisting?.repostCount ?? '0')
-  const [shareLabel, setShareLabel] = useState(redditExisting?.shareLabel ?? 'Share')
-  const [voteState, setVoteState] = useState(redditExisting?.voteState ?? 'neutral')
-  const [edited, setEdited] = useState(redditExisting?.isEdited ?? false)
-  const [pinned, setPinned] = useState(redditExisting?.isPinned ?? false)
-  const [spoiler, setSpoiler] = useState(redditExisting?.isSpoiler ?? false)
-  const [nsfw, setNsfw] = useState(redditExisting?.isNsfw ?? false)
-  const [nsfwLabel, setNsfwLabel] = useState(redditExisting?.nsfwLabel ?? 'NSFW')
-  const [contentWarning, setContentWarning] = useState(redditExisting?.contentWarning ?? '')
-  const [showJoin, setShowJoin] = useState(redditExisting?.showJoinButton ?? true)
-  const [showClose, setShowClose] = useState(redditExisting?.showCloseButton ?? true)
-  const [showSearch, setShowSearch] = useState(redditExisting?.showSearchButton ?? true)
-  const [showHeaderShare, setShowHeaderShare] = useState(redditExisting?.showHeaderShareButton ?? true)
-  const [showFilter, setShowFilter] = useState(redditExisting?.showFilterButton ?? false)
-  const [showOverflow, setShowOverflow] = useState(redditExisting?.showOverflowButton ?? true)
-  const [showSubredditIcon, setShowSubredditIcon] = useState(redditExisting?.showSubredditIcon ?? true)
-  const [showComposer, setShowComposer] = useState(redditExisting?.showCommentComposer ?? true)
-  const [commentPlaceholder, setCommentPlaceholder] = useState(redditExisting?.commentPlaceholder ?? 'Join the conversation')
-  const [showGif, setShowGif] = useState(redditExisting?.showGifButton ?? true)
-  const [showComposerImage, setShowComposerImage] = useState(redditExisting?.showComposerImageButton ?? true)
-  const [showComposerCollapse, setShowComposerCollapse] = useState(redditExisting?.showComposerCollapseButton ?? true)
-  const [showBottomNavigation, setShowBottomNavigation] = useState(redditExisting?.showBottomNavigation ?? true)
-  const [inboxBadge, setInboxBadge] = useState(redditExisting?.inboxBadge ?? '')
+  const [age, setAge] = useState(redditExisting?.ageLabel ?? redditDefaults.age ?? 'now')
+  const [flair, setFlair] = useState(redditExisting?.postFlair?.text ?? redditDefaults.flair ?? '')
+  const [flairBackground, setFlairBackground] = useState(redditExisting?.postFlair?.backgroundColor ?? redditDefaults.flairBackground ?? '#e72678')
+  const [flairTextColor, setFlairTextColor] = useState(redditExisting?.postFlair?.textColor ?? redditDefaults.flairTextColor ?? '#ffffff')
+  const [votes, setVotes] = useState(redditExisting?.voteCount ?? redditDefaults.votes ?? '0')
+  const [redditComments, setRedditComments] = useState(redditExisting?.commentCount ?? redditDefaults.comments ?? '0')
+  const [redditReposts, setRedditReposts] = useState(redditExisting?.repostCount ?? redditDefaults.reposts ?? '0')
+  const [shareLabel, setShareLabel] = useState(redditExisting?.shareLabel ?? redditDefaults.shareLabel ?? 'Share')
+  const [voteState, setVoteState] = useState(redditExisting?.voteState ?? redditDefaults.voteState ?? 'neutral')
+  const [edited, setEdited] = useState(redditExisting?.isEdited ?? redditDefaults.edited ?? false)
+  const [pinned, setPinned] = useState(redditExisting?.isPinned ?? redditDefaults.pinned ?? false)
+  const [spoiler, setSpoiler] = useState(redditExisting?.isSpoiler ?? redditDefaults.spoiler ?? false)
+  const [nsfw, setNsfw] = useState(redditExisting?.isNsfw ?? redditDefaults.nsfw ?? false)
+  const [nsfwLabel, setNsfwLabel] = useState(redditExisting?.nsfwLabel ?? redditDefaults.nsfwLabel ?? 'NSFW')
+  const [contentWarning, setContentWarning] = useState(redditExisting?.contentWarning ?? redditDefaults.contentWarning ?? '')
+  const [showJoin, setShowJoin] = useState(redditExisting?.showJoinButton ?? redditDefaults.showJoin ?? true)
+  const [showClose, setShowClose] = useState(redditExisting?.showCloseButton ?? redditDefaults.showClose ?? true)
+  const [showSearch, setShowSearch] = useState(redditExisting?.showSearchButton ?? redditDefaults.showSearch ?? true)
+  const [showHeaderShare, setShowHeaderShare] = useState(redditExisting?.showHeaderShareButton ?? redditDefaults.showHeaderShare ?? true)
+  const [showFilter, setShowFilter] = useState(redditExisting?.showFilterButton ?? redditDefaults.showFilter ?? false)
+  const [showOverflow, setShowOverflow] = useState(redditExisting?.showOverflowButton ?? redditDefaults.showOverflow ?? true)
+  const [showSubredditIcon, setShowSubredditIcon] = useState(redditExisting?.showSubredditIcon ?? redditDefaults.showSubredditIcon ?? true)
+  const [showComposer, setShowComposer] = useState(redditExisting?.showCommentComposer ?? redditDefaults.showComposer ?? true)
+  const [commentPlaceholder, setCommentPlaceholder] = useState(redditExisting?.commentPlaceholder ?? redditDefaults.commentPlaceholder ?? 'Join the conversation')
+  const [showGif, setShowGif] = useState(redditExisting?.showGifButton ?? redditDefaults.showGif ?? true)
+  const [showComposerImage, setShowComposerImage] = useState(redditExisting?.showComposerImageButton ?? redditDefaults.showComposerImage ?? true)
+  const [showComposerCollapse, setShowComposerCollapse] = useState(redditExisting?.showComposerCollapseButton ?? redditDefaults.showComposerCollapse ?? true)
+  const [showBottomNavigation, setShowBottomNavigation] = useState(redditExisting?.showBottomNavigation ?? redditDefaults.showBottomNavigation ?? true)
+  const [inboxBadge, setInboxBadge] = useState(redditExisting?.inboxBadge ?? redditDefaults.inboxBadge ?? '')
 
   useEffect(() => () => {
     if (!saved.current) pendingMedia.current.forEach((id) => void deleteMedia(id))
@@ -209,6 +223,32 @@ export function SocialPostEditorPage() {
     setRedditUserId(undefined)
     setRedditUserUrl(profile.photoUrl)
     if (profile.defaultCommunity) setSubreddit(profile.defaultCommunity)
+  }
+
+  const saveCurrentDefaults = () => {
+    if (platform === 'instagram') {
+      saveInstagramDefaults({
+        handle, displayName, location, music, displayedDate, likes,
+        comments: instagramComments, reposts, sends, savedPost, verified,
+        showHeader, showFollow, showEngagement, showCaption, showDate, showMusic, theme,
+      })
+    } else {
+      saveRedditDefaults({
+        subreddit, communitySubtitle, username, age, flair, flairBackground,
+        flairTextColor, votes, comments: redditComments, reposts: redditReposts,
+        shareLabel, voteState, edited, pinned, spoiler, nsfw, nsfwLabel,
+        contentWarning, showJoin, showClose, showSearch, showHeaderShare,
+        showFilter, showOverflow, showSubredditIcon, showComposer,
+        commentPlaceholder, showGif, showComposerImage, showComposerCollapse,
+        showBottomNavigation, inboxBadge, theme,
+      })
+    }
+    setDefaultsMessage('Saved. New posts will start with these settings.')
+  }
+
+  const clearDefaults = () => {
+    clearSocialPostDefaults(platform)
+    setDefaultsMessage('Saved defaults cleared. This post was not changed.')
   }
 
   const submit = async (event: FormEvent) => {
@@ -368,6 +408,15 @@ export function SocialPostEditorPage() {
               </fieldset>
             </>
           )}
+          <section className="post-default-actions">
+            <div>
+              <strong>Defaults for new {platform === 'instagram' ? 'photo' : 'forum'} posts</strong>
+              <small>Images and post-specific content are not included.</small>
+            </div>
+            <button type="button" className="secondary-action-button" onClick={saveCurrentDefaults}><BookmarkPlus size={18} />Save as defaults</button>
+            <button type="button" className="text-button" onClick={clearDefaults}><Trash2 size={17} />Clear</button>
+            {defaultsMessage && <p role="status">{defaultsMessage}</p>}
+          </section>
           <button className="primary-button full-width-button editor-save-button" type="submit" disabled={platform === 'instagram' ? !handle.trim() || !instagramMainId : !subreddit.trim() || !username.trim() || !title.trim()}><Save size={19} />Save & Preview</button>
         </form>
       </main>
