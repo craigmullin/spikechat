@@ -1,4 +1,4 @@
-import { Camera, MessageCircleMore, Radio } from 'lucide-react'
+import { Camera, HardDrive, MessageCircleMore, Radio } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function HomePage() {
@@ -23,7 +23,10 @@ export function HomePage() {
           <div><strong>Reddit-style</strong><span>Create community posts</span></div>
         </Link>
       </main>
-      <footer className="local-note">No accounts. No feeds. Your work stays local.</footer>
+      <footer className="home-footer">
+        <span className="local-note">No accounts. No feeds. Your work stays local.</span>
+        <Link to="/data" className="data-link"><HardDrive size={17} />Data & Backup</Link>
+      </footer>
     </div>
   )
 }

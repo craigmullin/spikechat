@@ -481,7 +481,67 @@ button {
 
 .mode-card strong { font-size: 19px; }
 .mode-card span { color: #aeb3bf; }
-.local-note { width: min(100%, 620px); margin: auto auto 0; padding-top: 28px; color: #737986; font-size: 13px; }
+.home-footer {
+  width: min(100%, 620px);
+  margin: auto auto 0;
+  padding-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.local-note { color: #737986; font-size: 13px; }
+.data-link {
+  min-height: 40px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: #b7bdc9;
+  background: #1b1e24;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.backup-shell { overflow-y: auto; }
+.backup-content {
+  width: min(100%, 620px);
+  margin: 0 auto;
+  padding: 20px 18px 40px;
+  display: grid;
+  gap: 16px;
+}
+.backup-intro { padding: 12px 4px 8px; text-align: center; }
+.backup-intro .empty-icon { margin: 0 auto; }
+.backup-intro h2 { margin: 14px 0 6px; }
+.backup-intro p { margin: 0 auto; max-width: 470px; color: #999faa; line-height: 1.5; }
+.backup-card {
+  padding: 17px;
+  border: 1px solid #2c3038;
+  border-radius: 20px;
+  background: #16181d;
+}
+.backup-card > div:first-child { display: flex; align-items: flex-start; gap: 12px; }
+.backup-card > div:first-child > svg { flex: none; margin-top: 2px; color: var(--color-primary); }
+.backup-card h2 { margin: 0 0 5px; font-size: 18px; }
+.backup-card p { margin: 0; color: #9ea3ad; line-height: 1.45; font-size: 14px; }
+.restore-summary {
+  margin-top: 14px;
+  padding: 13px;
+  border-radius: 14px;
+  background: #0c0e11;
+  display: grid;
+  gap: 6px;
+}
+.restore-summary span { color: #aeb3bd; font-size: 13px; }
+.backup-privacy { padding: 4px 5px; display: flex; gap: 9px; color: #9096a1; font-size: 13px; line-height: 1.4; }
+.backup-privacy svg { flex: none; color: #62c38b; }
+.backup-status { margin: 0; padding: 12px 14px; border-radius: 13px; display: flex; gap: 8px; align-items: center; }
+.backup-status.success { background: #173122; color: #9ee2b5; }
+.backup-status.error { background: #351a1d; color: #ff9994; }
 
 .social-list-title { flex: 1; }
 .social-post-list { display: grid; gap: 11px; }

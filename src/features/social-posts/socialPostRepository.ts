@@ -25,6 +25,10 @@ export function saveSocialPost(post: SocialPost) {
   )
 }
 
+export function replaceSocialPosts(posts: SocialPost[]) {
+  localStorage.setItem(KEY, JSON.stringify(posts))
+}
+
 function mediaIds(post: SocialPost) {
   return post.platform === 'instagram'
     ? [post.profileMediaId, post.mainMediaId]

@@ -32,3 +32,34 @@ export async function deleteMedia(
   const db = await dbPromise
   await db.delete(STORE_NAME, id)
 }
+
+export interface StoredMedia {
+  id: string
+  blob: Blob
+}
+
+export async function loadAllMedia(): Promise<StoredMedia[]> {
+  const db = await dbPromise
+  const transaction = db.transaction(STORE_NAME, 'readonly')
+  const [keys, blobs] = await Promise.all([
+    transaction.store.getAllKeys(),
+    transaction.store.getAll(),
+  ])
+  await transaction.done
+  return keys.map((key, index) => ({
+    id: String(key),
+    blob: blobs[index],
+  }))
+}
+
+export async function replaceAllMedia(
+  media: StoredMedia[],
+): Promise<void> {
+  const db = await dbPromise
+  const transaction = db.transaction(STORE_NAME, 'readwrite')
+  await transaction.store.clear()
+  await Promise.all(
+    media.map(({ id, blob }) => transaction.store.put(blob, id)),
+  )
+  await transaction.done
+}

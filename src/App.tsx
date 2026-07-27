@@ -7,6 +7,7 @@ import { PeoplePage } from './pages/PeoplePage'
 import { SocialPostEditorPage } from './features/social-posts/SocialPostEditorPage'
 import { SocialPostListPage } from './features/social-posts/SocialPostListPage'
 import { SocialPostPreviewPage } from './features/social-posts/SocialPostPreviewPage'
+import { BackupPage } from './features/backup/BackupPage'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/social-posts/new" element={<SocialPostEditorPage />} />
       <Route path="/social-posts/:postId" element={<SocialPostPreviewPage />} />
       <Route path="/social-posts/:postId/edit" element={<SocialPostEditorPage />} />
+      <Route path="/data" element={<BackupPage />} />
     </Routes>
   )
 }
