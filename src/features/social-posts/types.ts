@@ -50,6 +50,7 @@ export interface InstagramPost extends BasePost {
 export interface RedditPost extends BasePost {
   platform: 'reddit'
   subreddit: string
+  communitySubtitle?: string
   subredditMediaId?: string
   username: string
   personId?: string
@@ -59,6 +60,8 @@ export interface RedditPost extends BasePost {
   isEdited?: boolean
   isPinned?: boolean
   isSpoiler?: boolean
+  isNsfw?: boolean
+  nsfwLabel?: string
   contentWarning?: string
   title: string
   body?: string
@@ -77,6 +80,7 @@ export interface RedditPost extends BasePost {
   showJoinButton: boolean
   showCloseButton: boolean
   showSearchButton: boolean
+  showHeaderShareButton?: boolean
   showFilterButton: boolean
   showOverflowButton: boolean
   showSubredditIcon: boolean
@@ -85,6 +89,8 @@ export interface RedditPost extends BasePost {
   showGifButton: boolean
   showComposerImageButton: boolean
   showComposerCollapseButton: boolean
+  showBottomNavigation?: boolean
+  inboxBadge?: string
 }
 
 export type SocialPost = InstagramPost | RedditPost

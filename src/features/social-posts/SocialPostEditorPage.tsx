@@ -104,6 +104,7 @@ export function SocialPostEditorPage() {
   const redditExisting = existing?.platform === 'reddit' ? existing : undefined
   const [redditPersonId, setRedditPersonId] = useState(redditExisting?.personId ?? '')
   const [subreddit, setSubreddit] = useState(redditExisting?.subreddit ?? '')
+  const [communitySubtitle, setCommunitySubtitle] = useState(redditExisting?.communitySubtitle ?? '')
   const [username, setUsername] = useState(redditExisting?.username ?? '')
   const [redditCommunityId, setRedditCommunityId] = useState(redditExisting?.subredditMediaId)
   const [redditUserId, setRedditUserId] = useState(redditExisting?.userMediaId)
@@ -114,7 +115,8 @@ export function SocialPostEditorPage() {
   const [body, setBody] = useState(redditExisting?.body ?? '')
   const [age, setAge] = useState(redditExisting?.ageLabel ?? 'now')
   const [flair, setFlair] = useState(redditExisting?.postFlair?.text ?? '')
-  const [flairBackground, setFlairBackground] = useState(redditExisting?.postFlair?.backgroundColor ?? '#334155')
+  const [flairBackground, setFlairBackground] = useState(redditExisting?.postFlair?.backgroundColor ?? '#e72678')
+  const [flairTextColor, setFlairTextColor] = useState(redditExisting?.postFlair?.textColor ?? '#ffffff')
   const [votes, setVotes] = useState(redditExisting?.voteCount ?? '0')
   const [redditComments, setRedditComments] = useState(redditExisting?.commentCount ?? '0')
   const [redditReposts, setRedditReposts] = useState(redditExisting?.repostCount ?? '0')
@@ -123,11 +125,14 @@ export function SocialPostEditorPage() {
   const [edited, setEdited] = useState(redditExisting?.isEdited ?? false)
   const [pinned, setPinned] = useState(redditExisting?.isPinned ?? false)
   const [spoiler, setSpoiler] = useState(redditExisting?.isSpoiler ?? false)
+  const [nsfw, setNsfw] = useState(redditExisting?.isNsfw ?? false)
+  const [nsfwLabel, setNsfwLabel] = useState(redditExisting?.nsfwLabel ?? 'NSFW')
   const [contentWarning, setContentWarning] = useState(redditExisting?.contentWarning ?? '')
   const [showJoin, setShowJoin] = useState(redditExisting?.showJoinButton ?? true)
   const [showClose, setShowClose] = useState(redditExisting?.showCloseButton ?? true)
   const [showSearch, setShowSearch] = useState(redditExisting?.showSearchButton ?? true)
-  const [showFilter, setShowFilter] = useState(redditExisting?.showFilterButton ?? true)
+  const [showHeaderShare, setShowHeaderShare] = useState(redditExisting?.showHeaderShareButton ?? true)
+  const [showFilter, setShowFilter] = useState(redditExisting?.showFilterButton ?? false)
   const [showOverflow, setShowOverflow] = useState(redditExisting?.showOverflowButton ?? true)
   const [showSubredditIcon, setShowSubredditIcon] = useState(redditExisting?.showSubredditIcon ?? true)
   const [showComposer, setShowComposer] = useState(redditExisting?.showCommentComposer ?? true)
@@ -135,6 +140,8 @@ export function SocialPostEditorPage() {
   const [showGif, setShowGif] = useState(redditExisting?.showGifButton ?? true)
   const [showComposerImage, setShowComposerImage] = useState(redditExisting?.showComposerImageButton ?? true)
   const [showComposerCollapse, setShowComposerCollapse] = useState(redditExisting?.showComposerCollapseButton ?? true)
+  const [showBottomNavigation, setShowBottomNavigation] = useState(redditExisting?.showBottomNavigation ?? true)
+  const [inboxBadge, setInboxBadge] = useState(redditExisting?.inboxBadge ?? '')
 
   useEffect(() => () => {
     if (!saved.current) pendingMedia.current.forEach((id) => void deleteMedia(id))
@@ -226,20 +233,24 @@ export function SocialPostEditorPage() {
       if (!subreddit.trim() || !username.trim() || !title.trim()) return
       post = {
         id, platform, createdAt: existing?.createdAt ?? now, updatedAt: now, theme,
-        subreddit: subreddit.trim().replace(/^r\//, ''), subredditMediaId: redditCommunityId,
+        subreddit: subreddit.trim().replace(/^r\//, ''), communitySubtitle: communitySubtitle.trim() || undefined,
+        subredditMediaId: redditCommunityId,
         personId: redditPersonId || undefined,
         username: username.trim().replace(/^u\//, ''), userMediaId: redditUserId,
         userImageUrl: redditUserUrl, ageLabel: age,
-        isEdited: edited, isPinned: pinned, isSpoiler: spoiler,
+        isEdited: edited, isPinned: pinned, isSpoiler: spoiler, isNsfw: nsfw,
+        nsfwLabel: nsfwLabel.trim() || 'NSFW',
         contentWarning: contentWarning.trim() || undefined,
         title: title.trim(), body: body.trim() || undefined, mainMediaId: redditMainId,
-        postFlair: flair.trim() ? { text: flair.trim(), backgroundColor: flairBackground, textColor: '#ffffff' } : undefined,
+        postFlair: flair.trim() ? { text: flair.trim(), backgroundColor: flairBackground, textColor: flairTextColor } : undefined,
         voteCount: votes, commentCount: redditComments, repostCount: redditReposts, shareLabel,
         voteState, comments: parseComments(redditCommentText),
         showJoinButton: showJoin, showCloseButton: showClose, showSearchButton: showSearch,
+        showHeaderShareButton: showHeaderShare,
         showFilterButton: showFilter, showOverflowButton: showOverflow, showSubredditIcon,
         showCommentComposer: showComposer, commentPlaceholder, showGifButton: showGif,
         showComposerImageButton: showComposerImage, showComposerCollapseButton: showComposerCollapse,
+        showBottomNavigation, inboxBadge: inboxBadge.trim() || undefined,
       } satisfies RedditPost
     }
     saveSocialPost(post)
@@ -323,6 +334,7 @@ export function SocialPostEditorPage() {
             <>
               <fieldset><legend>Community</legend>
                 <label><span>Subreddit *</span><input value={subreddit} onChange={(e) => setSubreddit(e.target.value)} placeholder="community" /></label>
+                <label><span>Header subtitle</span><input value={communitySubtitle} onChange={(e) => setCommunitySubtitle(e.target.value)} placeholder="52.1k visitors per week" /></label>
                 <MediaPicker label="Community icon" mediaId={redditCommunityId} onFile={(file) => selectFile(file, false, setRedditCommunityId)} />
                 <div className="toggle-grid"><Toggle label="Join button" checked={showJoin} onChange={setShowJoin} /><Toggle label="Community icon" checked={showSubredditIcon} onChange={setShowSubredditIcon} /></div>
               </fieldset>
@@ -330,14 +342,15 @@ export function SocialPostEditorPage() {
                 <label><span>Use person</span><select value={redditPersonId} onChange={(e) => chooseRedditPerson(e.target.value)}><option value="">Custom author</option>{people.map((person) => <option key={person.id} value={person.id}>{person.name}{person.handle ? ` (u/${person.handle})` : ''}</option>)}</select></label>
                 <div className="form-grid"><label><span>Username *</span><input value={username} onChange={(e) => setUsername(e.target.value)} /></label><label><span>Age</span><input value={age} onChange={(e) => setAge(e.target.value)} placeholder="4h" /></label></div>
                 <MediaPicker label="User avatar" mediaId={redditUserId} fallbackUrl={redditUserUrl} onFile={(file) => { setRedditPersonId(''); setRedditUserUrl(undefined); selectFile(file, false, setRedditUserId) }} />
-                <div className="toggle-grid"><Toggle label="Edited indicator" checked={edited} onChange={setEdited} /><Toggle label="Pinned post" checked={pinned} onChange={setPinned} /><Toggle label="Spoiler" checked={spoiler} onChange={setSpoiler} /></div>
+                <div className="toggle-grid"><Toggle label="Edited indicator" checked={edited} onChange={setEdited} /><Toggle label="Pinned post" checked={pinned} onChange={setPinned} /><Toggle label="Spoiler" checked={spoiler} onChange={setSpoiler} /><Toggle label="NSFW / 18+ label" checked={nsfw} onChange={setNsfw} /></div>
               </fieldset>
               <fieldset><legend>Content</legend>
                 <label><span>Title *</span><textarea value={title} onChange={(e) => setTitle(e.target.value)} rows={3} /></label>
                 <label><span>Body</span><textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} /></label>
                 <MediaPicker label="Body image" mediaId={redditMainId} crop onFile={(file) => selectFile(file, true, setRedditMainId)} />
                 <label><span>Content warning</span><input value={contentWarning} onChange={(e) => setContentWarning(e.target.value)} placeholder="Optional warning label" /></label>
-                <div className="form-grid"><label><span>Post flair</span><input value={flair} onChange={(e) => setFlair(e.target.value)} /></label><label><span>Flair color</span><input type="color" value={flairBackground} onChange={(e) => setFlairBackground(e.target.value)} /></label></div>
+                {nsfw && <label><span>NSFW label text</span><input value={nsfwLabel} onChange={(e) => setNsfwLabel(e.target.value)} /></label>}
+                <div className="form-grid"><label><span>Post flair</span><input value={flair} onChange={(e) => setFlair(e.target.value)} /></label><label><span>Flair background</span><input type="color" value={flairBackground} onChange={(e) => setFlairBackground(e.target.value)} /></label><label><span>Flair text</span><input type="color" value={flairTextColor} onChange={(e) => setFlairTextColor(e.target.value)} /></label></div>
               </fieldset>
               <fieldset><legend>Engagement</legend>
                 <div className="form-grid counts-grid"><label><span>Votes</span><input value={votes} onChange={(e) => setVotes(e.target.value)} /></label><label><span>Comments</span><input value={redditComments} onChange={(e) => setRedditComments(e.target.value)} /></label><label><span>Reposts</span><input value={redditReposts} onChange={(e) => setRedditReposts(e.target.value)} /></label><label><span>Share label</span><input value={shareLabel} onChange={(e) => setShareLabel(e.target.value)} /></label></div>
@@ -350,7 +363,8 @@ export function SocialPostEditorPage() {
               </fieldset>
               <fieldset><legend>Appearance</legend>
                 <label><span>Theme</span><select value={theme} onChange={(e) => setTheme(e.target.value as Theme)}><option value="dark">Dark</option><option value="light">Light</option></select></label>
-                <div className="toggle-grid"><Toggle label="Close button" checked={showClose} onChange={setShowClose} /><Toggle label="Search button" checked={showSearch} onChange={setShowSearch} /><Toggle label="Filter button" checked={showFilter} onChange={setShowFilter} /><Toggle label="Overflow button" checked={showOverflow} onChange={setShowOverflow} /></div>
+                <label><span>Inbox badge</span><input value={inboxBadge} onChange={(e) => setInboxBadge(e.target.value)} placeholder="4" /></label>
+                <div className="toggle-grid"><Toggle label="Back button" checked={showClose} onChange={setShowClose} /><Toggle label="Search button" checked={showSearch} onChange={setShowSearch} /><Toggle label="Header share button" checked={showHeaderShare} onChange={setShowHeaderShare} /><Toggle label="Extra filter button" checked={showFilter} onChange={setShowFilter} /><Toggle label="Author overflow button" checked={showOverflow} onChange={setShowOverflow} /><Toggle label="Bottom navigation" checked={showBottomNavigation} onChange={setShowBottomNavigation} /></div>
               </fieldset>
             </>
           )}
