@@ -5,6 +5,7 @@ import { ChatHeader } from '../components/ChatHeader'
 import { ChatInput } from '../components/ChatInput'
 import { MessageBubble } from '../components/MessageBubble'
 import { CropEditor } from '../features/media/CropEditor'
+import { ExportControls } from '../features/export/ExportControls'
 import { optimizeImage } from '../features/media/imageProcessing'
 import { deleteMedia, loadMedia, saveMedia } from '../mediaDb'
 import {
@@ -32,6 +33,8 @@ export function ChatPage() {
   const [editingText, setEditingText] = useState('')
   const [imageEditUrl, setImageEditUrl] = useState<string | null>(null)
   const replaceImageInput = useRef<HTMLInputElement>(null)
+  const captureRef = useRef<HTMLElement>(null)
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     saveMessages(messages)
@@ -197,7 +200,15 @@ const handleSendImageMessage = async (
 
   return (
     <div className="app-shell">
-      <main className="chat-card">
+      <div className="chat-export-toolbar">
+        <ExportControls
+          targetRef={captureRef}
+          filename={`spikechat-${person.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`}
+          onBeforeCapture={() => setExporting(true)}
+          onAfterCapture={() => setExporting(false)}
+        />
+      </div>
+      <main ref={captureRef} className={`chat-card ${exporting ? 'chat-exporting' : ''}`}>
         <ChatHeader person={person} />
 
         <section className="messages">
