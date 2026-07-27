@@ -694,6 +694,9 @@ button {
 .follow-button, .join-button { min-height: 34px; padding: 0 14px; border-radius: 9px; background: #2879ec; color: white; font-weight: 700; cursor: pointer; }
 .instagram-main-image { width: 100%; max-height: 68vh; display: block; object-fit: contain; background: #111; }
 .media-placeholder { min-height: 120px; background: linear-gradient(135deg, #24272d, #111318); }
+.media-error { display: flex; min-height: 96px; align-items: center; justify-content: center; flex-direction: column; gap: 6px; color: #aeb4c0; font-size: .78rem; }
+.media-loading { animation: media-pulse 1.2s ease-in-out infinite alternate; }
+@keyframes media-pulse { to { opacity: .62; } }
 .instagram-engagement { min-height: 55px; padding: 10px 14px; display: flex; align-items: center; gap: 17px; }
 .instagram-engagement span { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
 .instagram-engagement > svg:last-child { margin-left: auto; }

@@ -5,6 +5,7 @@ import { ChatHeader } from '../components/ChatHeader'
 import { ChatInput } from '../components/ChatInput'
 import { MessageBubble } from '../components/MessageBubble'
 import { CropEditor } from '../features/media/CropEditor'
+import { optimizeImage } from '../features/media/imageProcessing'
 import { deleteMedia, loadMedia, saveMedia } from '../mediaDb'
 import {
   loadMessages,
@@ -70,7 +71,7 @@ const handleSendImageMessage = async (
   const messageId = crypto.randomUUID()
   const mediaId = crypto.randomUUID()
 
-  await saveMedia(mediaId, file)
+  await saveMedia(mediaId, await optimizeImage(file))
 
   const newMessage: Message = {
     id: messageId,
@@ -182,7 +183,7 @@ const handleSendImageMessage = async (
     const previousMediaId = selectedMessage.mediaId
     const nextMediaId = crypto.randomUUID()
 
-    await saveMedia(nextMediaId, blob)
+    await saveMedia(nextMediaId, await optimizeImage(blob))
     setMessages((current) =>
       current.map((message) =>
         message.id === selectedMessage.id

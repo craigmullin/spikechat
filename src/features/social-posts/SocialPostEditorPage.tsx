@@ -6,6 +6,8 @@ import { deleteMedia, saveMedia } from '../../mediaDb'
 import { loadPeople } from '../../storage'
 import { CropEditor } from '../media/CropEditor'
 import { MediaImage } from '../media/MediaImage'
+import { imageProcessingError, optimizeImage, validateImage } from '../media/imageProcessing'
+import type { ImagePurpose } from '../media/imageProcessing'
 import { loadSocialPost, loadSocialPosts, saveSocialPost } from './socialPostRepository'
 import type { InstagramPost, RedditPost, SocialPlatform, SocialPost, Theme } from './types'
 
@@ -67,6 +69,7 @@ export function SocialPostEditorPage() {
   const now = new Date().toISOString()
   const [theme, setTheme] = useState<Theme>(existing?.theme ?? 'dark')
   const [cropJob, setCropJob] = useState<CropJob>()
+  const [mediaError, setMediaError] = useState('')
   const pendingMedia = useRef(new Set<string>())
   const saved = useRef(false)
 
@@ -129,26 +132,43 @@ export function SocialPostEditorPage() {
     if (!saved.current) pendingMedia.current.forEach((id) => void deleteMedia(id))
   }, [])
 
-  const persistBlob = async (blob: Blob, setter: (id: string) => void) => {
+  const persistBlob = async (
+    blob: Blob,
+    setter: (id: string) => void,
+    purpose: ImagePurpose,
+  ) => {
     const id = crypto.randomUUID()
-    await saveMedia(id, blob)
+    await saveMedia(id, await optimizeImage(blob, purpose))
     pendingMedia.current.add(id)
     setter(id)
+    setMediaError('')
   }
 
   const selectFile = (file: File, shouldCrop: boolean, setter: (id: string) => void) => {
-    if (!file.type.startsWith('image/')) return
+    try {
+      validateImage(file)
+      setMediaError('')
+    } catch (error) {
+      setMediaError(imageProcessingError(error))
+      return
+    }
     if (!shouldCrop) {
-      void persistBlob(file, setter)
+      void persistBlob(file, setter, 'avatar').catch((error) =>
+        setMediaError(imageProcessingError(error)),
+      )
       return
     }
     const url = URL.createObjectURL(file)
     setCropJob({
       url,
       finish: async (blob) => {
-        await persistBlob(blob, setter)
-        URL.revokeObjectURL(url)
-        setCropJob(undefined)
+        try {
+          await persistBlob(blob, setter, 'content')
+          URL.revokeObjectURL(url)
+          setCropJob(undefined)
+        } catch (error) {
+          setMediaError(imageProcessingError(error))
+        }
       },
     })
   }
@@ -248,6 +268,7 @@ export function SocialPostEditorPage() {
       </header>
       <main className="form-content">
         <form className="social-editor-form" onSubmit={submit}>
+          {mediaError && <p className="form-error" role="alert">{mediaError}</p>}
           {platform === 'instagram' ? (
             <>
               <fieldset><legend>Account</legend>

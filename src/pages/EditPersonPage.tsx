@@ -2,10 +2,9 @@ import { ArrowLeft, Camera, Save, Trash2 } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { blobToDataUrl, imageProcessingError, optimizeImage } from '../features/media/imageProcessing'
 import { loadPeople, savePeople } from '../storage'
 import type { Person } from '../types'
-
-const MAX_IMAGE_SIZE = 500_000
 
 export function EditPersonPage() {
   const navigate = useNavigate()
@@ -23,37 +22,21 @@ export function EditPersonPage() {
   const [photoUrl, setPhotoUrl] = useState(existingPerson?.photoUrl ?? '')
   const [imageError, setImageError] = useState('')
 
-  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
 
     if (!file) {
       return
     }
 
-    if (!file.type.startsWith('image/')) {
-      setImageError('Please choose an image file.')
-      return
+    try {
+      setPhotoUrl(await blobToDataUrl(await optimizeImage(file, 'avatar')))
+      setImageError('')
+    } catch (error) {
+      setImageError(imageProcessingError(error))
+    } finally {
+      event.target.value = ''
     }
-
-    if (file.size > MAX_IMAGE_SIZE) {
-      setImageError('Please choose an image smaller than 500 KB for now.')
-      return
-    }
-
-    const reader = new FileReader()
-
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setPhotoUrl(reader.result)
-        setImageError('')
-      }
-    }
-
-    reader.onerror = () => {
-      setImageError('Could not read that image.')
-    }
-
-    reader.readAsDataURL(file)
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -148,7 +131,7 @@ export function EditPersonPage() {
               className="hidden-file-input"
               type="file"
               accept="image/*"
-              onChange={handlePhotoChange}
+              onChange={(event) => void handlePhotoChange(event)}
             />
 
             <button

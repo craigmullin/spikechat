@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import type { MessageDirection } from '../types'
 import { CropEditor } from '../features/media/CropEditor'
+import { imageProcessingError, validateImage } from '../features/media/imageProcessing'
 
 interface ChatInputProps {
   onSendTextMessage: (
@@ -13,7 +14,7 @@ interface ChatInputProps {
   onSendImageMessage: (
     file: File,
     direction: MessageDirection,
-  ) => void
+  ) => Promise<void>
 }
 
 export function ChatInput({
@@ -29,6 +30,8 @@ export function ChatInput({
     file: File
     url: string
   } | null>(null)
+  const [imageError, setImageError] = useState('')
+  const [sendingImage, setSendingImage] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -37,14 +40,14 @@ export function ChatInput({
   ) => {
     const file = event.target.files?.[0]
 
-    if (!file || !file.type.startsWith('image/')) {
-      return
+    if (!file) return
+    try {
+      validateImage(file)
+      setImageError('')
+      setCropSource({ file, url: URL.createObjectURL(file) })
+    } catch (error) {
+      setImageError(imageProcessingError(error))
     }
-
-    setCropSource({
-      file,
-      url: URL.createObjectURL(file),
-    })
 
     event.target.value = ''
   }
@@ -81,10 +84,18 @@ export function ChatInput({
     setPendingImage(null)
   }
 
-  const submit = (direction: MessageDirection) => {
+  const submit = async (direction: MessageDirection) => {
     if (pendingImage) {
-      onSendImageMessage(pendingImage.file, direction)
-      clearPendingImage()
+      try {
+        setSendingImage(true)
+        await onSendImageMessage(pendingImage.file, direction)
+        clearPendingImage()
+        setImageError('')
+      } catch (error) {
+        setImageError(imageProcessingError(error))
+      } finally {
+        setSendingImage(false)
+      }
       return
     }
 
@@ -127,6 +138,7 @@ export function ChatInput({
           </button>
         </div>
       )}
+      {imageError && <p className="form-error composer-error" role="alert">{imageError}</p>}
 
       <div className="chat-input-area">
         {/* <button
@@ -161,7 +173,7 @@ export function ChatInput({
             onKeyDown={(event) => {
               if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault()
-                submit('sent')
+                void submit('sent')
               }
             }}
             placeholder={
@@ -188,8 +200,8 @@ export function ChatInput({
           <button
             type="button"
             className="split-send-half receive-half"
-            onClick={() => submit('received')}
-            disabled={!hasContent}
+            onClick={() => void submit('received')}
+            disabled={!hasContent || sendingImage}
             aria-label="Add as received message"
             title="Receive"
           >
@@ -201,8 +213,8 @@ export function ChatInput({
           <button
             type="button"
             className="split-send-half send-half"
-            onClick={() => submit('sent')}
-            disabled={!hasContent}
+            onClick={() => void submit('sent')}
+            disabled={!hasContent || sendingImage}
             aria-label="Add as sent message"
             title="Send"
           >
