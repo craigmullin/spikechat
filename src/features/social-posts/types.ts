@@ -9,6 +9,16 @@ interface BasePost {
   theme: Theme
 }
 
+export interface FictionalComment {
+  id: string
+  author: string
+  text: string
+  ageLabel?: string
+  likeCount?: string
+  isCreator?: boolean
+  replies?: FictionalComment[]
+}
+
 export interface InstagramPost extends BasePost {
   platform: 'instagram'
   personId?: string
@@ -17,6 +27,7 @@ export interface InstagramPost extends BasePost {
   profileMediaId?: string
   profileImageUrl?: string
   mainMediaId: string
+  carouselMediaIds?: string[]
   caption: string
   location?: string
   musicLabel?: string
@@ -27,6 +38,7 @@ export interface InstagramPost extends BasePost {
   sendCount?: string
   isSaved?: boolean
   isVerified?: boolean
+  comments?: FictionalComment[]
   showHeader: boolean
   showFollowButton: boolean
   showEngagement: boolean
@@ -45,6 +57,9 @@ export interface RedditPost extends BasePost {
   userImageUrl?: string
   ageLabel?: string
   isEdited?: boolean
+  isPinned?: boolean
+  isSpoiler?: boolean
+  contentWarning?: string
   title: string
   body?: string
   mainMediaId?: string
@@ -58,6 +73,7 @@ export interface RedditPost extends BasePost {
   repostCount?: string
   shareLabel?: string
   voteState?: 'up' | 'down' | 'neutral'
+  comments?: FictionalComment[]
   showJoinButton: boolean
   showCloseButton: boolean
   showSearchButton: boolean

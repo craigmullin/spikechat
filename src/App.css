@@ -782,6 +782,40 @@ button {
 .social-preview.light .reddit-body { color: #30343a; }
 .social-preview.light .reddit-action-group,
 .social-preview.light .reddit-composer span { border-color: #c9ccd2; }
+.instagram-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.instagram-carousel::-webkit-scrollbar { display: none; }
+.instagram-carousel .instagram-main-image { min-width: 100%; scroll-snap-align: start; }
+.carousel-count { margin: 7px 14px 0; color: #9ba0a9; font-size: 12px; text-align: right; }
+.fictional-comments { padding: 8px 14px 16px; border-top: 1px solid rgba(128,128,128,.2); }
+.fictional-comments p { margin: 7px 0; line-height: 1.4; }
+.fictional-comments p small { display: block; margin-top: 3px; color: #8f949e; font-size: 10px; }
+.reddit-labels { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.post-indicator { padding: 4px 7px; border-radius: 6px; background: #2769d8; color: #fff; font-size: 11px; font-weight: 700; }
+.post-indicator.warning { background: #b13b2d; }
+.reddit-comments { margin-top: 16px; padding: 4px 0 0; }
+.reddit-comment { padding: 11px 0 4px 12px; border-left: 2px solid #343840; }
+.reddit-comment.reply { margin: 8px 0 0 10px; }
+.reddit-comment small, .reddit-comment span { color: #9298a3; font-size: 10px; }
+.reddit-comment p { margin: 5px 0; }
+.carousel-editor-list { display: flex; gap: 8px; overflow-x: auto; }
+.carousel-editor-list > div { position: relative; flex: 0 0 90px; }
+.carousel-editor-list img { width: 90px; height: 90px; border-radius: 10px; object-fit: cover; }
+.carousel-editor-list button { width: 100%; margin-top: 3px; color: #ff858b; background: transparent; }
+.identity-platform-card { padding: 14px; border: 1px solid #2c2c2e; border-radius: 14px; }
+.platform-avatar-row, .identity-options { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.person-card-details small { color: #858b96; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.message-with-date { display: contents; }
+.chat-date-separator { width: 100%; padding: 10px; color: #888d97; font-size: 11px; text-align: center; }
+.message-content { position: relative; max-width: 82%; display: flex; flex-direction: column; }
+.message-row.sent .message-content { align-items: flex-end; }
+.message-row.received .message-content { align-items: flex-start; }
+.message-content .message-bubble, .message-content .image-message { max-width: 100%; }
+.message-metadata { display: block; margin-top: 3px; padding: 0 4px; color: #7f8490; font-size: 9px; text-transform: capitalize; }
+.message-reaction { position: absolute; right: 2px; bottom: 15px; padding: 1px 5px; border-radius: 999px; background: #25282e; box-shadow: 0 1px 5px rgba(0,0,0,.45); font-size: 13px; }
+.message-row.received .message-reaction { right: auto; left: 2px; }
+.image-caption { margin: 0; padding: 8px 10px; color: white; text-align: left; }
+.reaction-picker { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.reaction-picker button { min-width: 42px; min-height: 38px; padding: 5px; border-radius: 10px; background: #272a31; color: white; }
 
 @media (min-width: 700px) {
   .mode-grid { grid-template-columns: repeat(3, 1fr); }

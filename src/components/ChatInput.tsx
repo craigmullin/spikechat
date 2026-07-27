@@ -14,6 +14,7 @@ interface ChatInputProps {
   onSendImageMessage: (
     file: File,
     direction: MessageDirection,
+    caption?: string,
   ) => Promise<void>
 }
 
@@ -88,8 +89,9 @@ export function ChatInput({
     if (pendingImage) {
       try {
         setSendingImage(true)
-        await onSendImageMessage(pendingImage.file, direction)
+        await onSendImageMessage(pendingImage.file, direction, text.trim() || undefined)
         clearPendingImage()
+        setText('')
         setImageError('')
       } catch (error) {
         setImageError(imageProcessingError(error))
@@ -177,10 +179,9 @@ export function ChatInput({
               }
             }}
             placeholder={
-              pendingImage ? 'Add a caption later...' : 'Message'
+              pendingImage ? 'Add an optional caption' : 'Message'
             }
             aria-label="Message"
-            disabled={Boolean(pendingImage)}
           />
 
           {/* <button

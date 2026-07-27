@@ -51,13 +51,21 @@ export function MessageBubble({ message, onClick }: MessageBubbleProps) {
       }}
       aria-label="Open message options"
     >
-      {message.type === 'image' ? (
-        <div className="image-message">
-          <MediaImage mediaId={message.mediaId} alt="Chat attachment" />
-        </div>
-      ) : (
-        <div className="message-bubble">{message.text}</div>
-      )}
+      <div className="message-content">
+        {message.type === 'image' ? (
+          <div className="image-message">
+            <MediaImage mediaId={message.mediaId} alt="Chat attachment" />
+            {message.text && <p className="image-caption">{message.text}</p>}
+          </div>
+        ) : (
+          <div className="message-bubble">{message.text}</div>
+        )}
+        {message.reaction && <span className="message-reaction">{message.reaction}</span>}
+        <span className="message-metadata">
+          {new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit' }).format(message.createdAt)}
+          {message.direction === 'sent' && ` · ${message.deliveryStatus || 'sent'}`}
+        </span>
+      </div>
     </button>
   )
 }

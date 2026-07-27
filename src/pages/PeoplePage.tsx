@@ -7,8 +7,10 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { loadPeople } from '../storage'
+import { loadMessages, loadPeople } from '../storage'
+import { loadSocialPosts } from '../features/social-posts/socialPostRepository'
 import type { Person } from '../types'
+import { personInitials } from '../features/people/identity'
 
 export function PeoplePage() {
   const [people, setPeople] = useState<Person[]>([])
@@ -64,17 +66,24 @@ export function PeoplePage() {
                     {person.photoUrl ? (
                       <img src={person.photoUrl} alt={person.name} />
                     ) : (
-                      <span>{person.name.charAt(0).toUpperCase()}</span>
+                      <span>{personInitials(person)}</span>
                     )}
                   </div>
 
                   <div className="person-card-details">
-                    <strong>{person.name}</strong>
+                    <strong>{person.name}{person.archivedAt ? ' · Archived' : ''}</strong>
                     <span>
                       {person.handle
                         ? `@${person.handle}${person.status ? ` · ${person.status}` : ''}`
                         : person.status || 'Active now'}
                     </span>
+                    {(person.pronouns || person.bio) && (
+                      <small>{[person.pronouns, person.bio].filter(Boolean).join(' · ')}</small>
+                    )}
+                    <small>
+                      Used in {loadMessages().filter((message) => message.personId === person.id).length} messages and{' '}
+                      {loadSocialPosts().filter((post) => post.personId === person.id).length} posts
+                    </small>
                   </div>
 
                   <MessageCircleMore size={21} />

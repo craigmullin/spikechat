@@ -58,6 +58,7 @@ export function ChatPage() {
     direction,
     type: 'text',
     text,
+    deliveryStatus: direction === 'sent' ? 'read' : undefined,
     createdAt: Date.now(),
   }
 
@@ -70,6 +71,7 @@ export function ChatPage() {
 const handleSendImageMessage = async (
   file: File,
   direction: MessageDirection,
+  caption?: string,
 ) => {
   const messageId = crypto.randomUUID()
   const mediaId = crypto.randomUUID()
@@ -82,6 +84,8 @@ const handleSendImageMessage = async (
     direction,
     type: 'image',
     mediaId,
+    text: caption,
+    deliveryStatus: direction === 'sent' ? 'read' : undefined,
     createdAt: Date.now(),
   }
 
@@ -170,6 +174,14 @@ const handleSendImageMessage = async (
     closeMessageOptions()
   }
 
+  const setReaction = (reaction?: string) => {
+    if (!selectedMessage) return
+    setMessages((current) => current.map((message) =>
+      message.id === selectedMessage.id ? { ...message, reaction } : message,
+    ))
+    closeMessageOptions()
+  }
+
   const beginImageEdit = async (file?: File) => {
     if (!selectedMessage?.mediaId) return
 
@@ -228,13 +240,17 @@ const handleSendImageMessage = async (
           </div> */}
 
           <div className="message-list">
-            {conversationMessages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                onClick={openMessageOptions}
-              />
-            ))}
+            {conversationMessages.map((message, index) => {
+              const previous = conversationMessages[index - 1]
+              const date = new Date(message.createdAt).toDateString()
+              const showDate = !previous || new Date(previous.createdAt).toDateString() !== date
+              return (
+                <div key={message.id} className="message-with-date">
+                  {showDate && <div className="chat-date-separator">{new Intl.DateTimeFormat([], { month: 'short', day: 'numeric', year: 'numeric' }).format(message.createdAt)}</div>}
+                  <MessageBubble message={message} onClick={openMessageOptions} />
+                </div>
+              )
+            })}
           </div>
         </section>
 
@@ -332,6 +348,14 @@ const handleSendImageMessage = async (
                 Duplicate Message
             </button>
             )}
+
+            <div className="reaction-picker" aria-label="Message reaction">
+              {['❤️', '😂', '👍', '😮', '😢', ''].map((reaction) => (
+                <button key={reaction || 'remove'} type="button" onClick={() => setReaction(reaction || undefined)} aria-label={reaction ? `React ${reaction}` : 'Remove reaction'}>
+                  {reaction || 'None'}
+                </button>
+              ))}
+            </div>
 
             <button
               type="button"

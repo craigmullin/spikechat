@@ -1,15 +1,18 @@
-import { ArrowLeft, Camera, Save, Trash2 } from 'lucide-react'
+import { Archive, ArrowLeft, Camera, Copy, Save, Trash2 } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { blobToDataUrl, imageProcessingError, optimizeImage } from '../features/media/imageProcessing'
-import { loadPeople, savePeople } from '../storage'
+import { loadMessages, loadPeople, savePeople } from '../storage'
+import { loadSocialPosts } from '../features/social-posts/socialPostRepository'
 import type { Person } from '../types'
 
 export function EditPersonPage() {
   const navigate = useNavigate()
   const { personId } = useParams()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const instagramPhotoInputRef = useRef<HTMLInputElement>(null)
+  const redditPhotoInputRef = useRef<HTMLInputElement>(null)
 
   const existingPerson = useMemo(
     () => loadPeople().find((person) => person.id === personId),
@@ -18,7 +21,18 @@ export function EditPersonPage() {
 
   const [name, setName] = useState(existingPerson?.name ?? '')
   const [handle, setHandle] = useState(existingPerson?.handle ?? '')
+  const [instagramHandle, setInstagramHandle] = useState(existingPerson?.instagramHandle ?? '')
+  const [instagramDisplayName, setInstagramDisplayName] = useState(existingPerson?.instagramDisplayName ?? '')
+  const [instagramPhotoUrl, setInstagramPhotoUrl] = useState(existingPerson?.instagramPhotoUrl ?? '')
+  const [instagramVerified, setInstagramVerified] = useState(existingPerson?.instagramVerified ?? false)
+  const [redditUsername, setRedditUsername] = useState(existingPerson?.redditUsername ?? '')
+  const [redditPhotoUrl, setRedditPhotoUrl] = useState(existingPerson?.redditPhotoUrl ?? '')
+  const [redditDefaultCommunity, setRedditDefaultCommunity] = useState(existingPerson?.redditDefaultCommunity ?? '')
   const [status, setStatus] = useState(existingPerson?.status ?? 'Active now')
+  const [pronouns, setPronouns] = useState(existingPerson?.pronouns ?? '')
+  const [bio, setBio] = useState(existingPerson?.bio ?? '')
+  const [isVerified, setIsVerified] = useState(existingPerson?.isVerified ?? false)
+  const [accentColor, setAccentColor] = useState(existingPerson?.accentColor ?? '#1688f8')
   const [photoUrl, setPhotoUrl] = useState(existingPerson?.photoUrl ?? '')
   const [imageError, setImageError] = useState('')
 
@@ -31,6 +45,22 @@ export function EditPersonPage() {
 
     try {
       setPhotoUrl(await blobToDataUrl(await optimizeImage(file, 'avatar')))
+      setImageError('')
+    } catch (error) {
+      setImageError(imageProcessingError(error))
+    } finally {
+      event.target.value = ''
+    }
+  }
+
+  const handlePlatformPhoto = async (
+    event: ChangeEvent<HTMLInputElement>,
+    setter: (value: string) => void,
+  ) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    try {
+      setter(await blobToDataUrl(await optimizeImage(file, 'avatar')))
       setImageError('')
     } catch (error) {
       setImageError(imageProcessingError(error))
@@ -54,7 +84,18 @@ export function EditPersonPage() {
       id: existingPerson?.id ?? crypto.randomUUID(),
       name: trimmedName,
       handle: handle.trim().replace(/^@/, '') || undefined,
+      instagramHandle: instagramHandle.trim().replace(/^@/, '') || undefined,
+      instagramDisplayName: instagramDisplayName.trim() || undefined,
+      instagramPhotoUrl: instagramPhotoUrl || undefined,
+      instagramVerified,
+      redditUsername: redditUsername.trim().replace(/^(u\/|@)/, '') || undefined,
+      redditPhotoUrl: redditPhotoUrl || undefined,
+      redditDefaultCommunity: redditDefaultCommunity.trim().replace(/^r\//, '') || undefined,
       status: status.trim() || 'Active now',
+      pronouns: pronouns.trim() || undefined,
+      bio: bio.trim() || undefined,
+      isVerified,
+      accentColor,
       photoUrl: photoUrl || undefined,
     }
 
@@ -71,9 +112,22 @@ export function EditPersonPage() {
       return
     }
 
-    const confirmed = window.confirm(
-      `Delete ${existingPerson.name}? Their messages will remain for now.`,
-    )
+    const useCount =
+      loadMessages().filter((message) => message.personId === existingPerson.id).length +
+      loadSocialPosts().filter((post) => post.personId === existingPerson.id).length
+    if (useCount > 0) {
+      const confirmed = window.confirm(
+        `${existingPerson.name} is used in ${useCount} item${useCount === 1 ? '' : 's'}. Archive the identity instead so existing content keeps working?`,
+      )
+      if (!confirmed) return
+      savePeople(loadPeople().map((person) =>
+        person.id === existingPerson.id ? { ...person, archivedAt: Date.now() } : person,
+      ))
+      navigate('/people')
+      return
+    }
+
+    const confirmed = window.confirm(`Permanently delete ${existingPerson.name}?`)
 
     if (!confirmed) {
       return
@@ -85,6 +139,18 @@ export function EditPersonPage() {
 
     savePeople(nextPeople)
     navigate('/people')
+  }
+
+  const handleDuplicate = () => {
+    if (!existingPerson) return
+    const duplicate = {
+      ...existingPerson,
+      id: crypto.randomUUID(),
+      name: `${existingPerson.name} Copy`,
+      archivedAt: undefined,
+    }
+    savePeople([...loadPeople(), duplicate])
+    navigate(`/people/${duplicate.id}/edit`)
   }
 
   return (
@@ -189,6 +255,55 @@ export function EditPersonPage() {
             />
           </label>
 
+          <div className="form-grid">
+            <label>
+              <span>Instagram-style handle</span>
+              <input value={instagramHandle} onChange={(event) => setInstagramHandle(event.target.value)} placeholder={handle || 'photo_handle'} autoCapitalize="none" />
+            </label>
+            <label>
+              <span>Reddit-style username</span>
+              <input value={redditUsername} onChange={(event) => setRedditUsername(event.target.value)} placeholder={handle || 'forum_username'} autoCapitalize="none" />
+            </label>
+          </div>
+
+          <fieldset className="identity-platform-card">
+            <legend>Photo-post profile</legend>
+            <label><span>Display name</span><input value={instagramDisplayName} onChange={(event) => setInstagramDisplayName(event.target.value)} placeholder={name || 'Display name'} /></label>
+            <div className="platform-avatar-row">
+              <div className="avatar avatar-list">{instagramPhotoUrl ? <img src={instagramPhotoUrl} alt="" /> : <span>IG</span>}</div>
+              <button type="button" className="secondary-action-button" onClick={() => instagramPhotoInputRef.current?.click()}><Camera size={17} />{instagramPhotoUrl ? 'Change avatar' : 'Separate avatar'}</button>
+              {instagramPhotoUrl && <button type="button" className="text-button" onClick={() => setInstagramPhotoUrl('')}>Use main</button>}
+            </div>
+            <input ref={instagramPhotoInputRef} className="hidden-file-input" type="file" accept="image/*" onChange={(event) => void handlePlatformPhoto(event, setInstagramPhotoUrl)} />
+            <label className="toggle-field"><input type="checkbox" checked={instagramVerified} onChange={(event) => setInstagramVerified(event.target.checked)} /><span>Verified by default</span></label>
+          </fieldset>
+
+          <fieldset className="identity-platform-card">
+            <legend>Forum profile</legend>
+            <label><span>Default community</span><input value={redditDefaultCommunity} onChange={(event) => setRedditDefaultCommunity(event.target.value)} placeholder="community" /></label>
+            <div className="platform-avatar-row">
+              <div className="avatar avatar-list">{redditPhotoUrl ? <img src={redditPhotoUrl} alt="" /> : <span>R</span>}</div>
+              <button type="button" className="secondary-action-button" onClick={() => redditPhotoInputRef.current?.click()}><Camera size={17} />{redditPhotoUrl ? 'Change avatar' : 'Separate avatar'}</button>
+              {redditPhotoUrl && <button type="button" className="text-button" onClick={() => setRedditPhotoUrl('')}>Use main</button>}
+            </div>
+            <input ref={redditPhotoInputRef} className="hidden-file-input" type="file" accept="image/*" onChange={(event) => void handlePlatformPhoto(event, setRedditPhotoUrl)} />
+          </fieldset>
+
+          <label>
+            <span>Pronouns</span>
+            <input value={pronouns} onChange={(event) => setPronouns(event.target.value)} placeholder="she/her" />
+          </label>
+
+          <label>
+            <span>Bio / character notes</span>
+            <textarea value={bio} onChange={(event) => setBio(event.target.value)} rows={3} placeholder="A short reusable description of this fictional identity." />
+          </label>
+
+          <div className="identity-options">
+            <label className="toggle-field"><input type="checkbox" checked={isVerified} onChange={(event) => setIsVerified(event.target.checked)} /><span>Verified identity</span></label>
+            <label><span>Accent color</span><input type="color" value={accentColor} onChange={(event) => setAccentColor(event.target.value)} /></label>
+          </div>
+
           <button
             className="primary-button full-width-button"
             type="submit"
@@ -199,14 +314,13 @@ export function EditPersonPage() {
           </button>
 
           {existingPerson && (
-            <button
-              className="danger-button full-width-button"
-              type="button"
-              onClick={handleDelete}
-            >
-              <Trash2 size={18} />
-              Delete Person
-            </button>
+            <>
+              <button className="secondary-action-button full-width-button" type="button" onClick={handleDuplicate}><Copy size={18} />Duplicate Person</button>
+              <button className="danger-button full-width-button" type="button" onClick={handleDelete}>
+                {existingPerson.archivedAt ? <Trash2 size={18} /> : <Archive size={18} />}
+                Delete or Archive
+              </button>
+            </>
           )}
         </form>
       </main>

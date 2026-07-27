@@ -1,7 +1,8 @@
-import { ArrowLeft, Camera, Plus, Radio, Trash2 } from 'lucide-react'
+import { ArrowLeft, Camera, Copy, Plus, Radio, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { deleteSocialPost, loadSocialPosts } from './socialPostRepository'
+import { deleteSocialPost, loadSocialPosts, saveSocialPost } from './socialPostRepository'
+import type { SocialPost } from './types'
 import type { SocialPlatform } from './types'
 
 export function SocialPostListPage() {
@@ -14,6 +15,12 @@ export function SocialPostListPage() {
   const remove = async (id: string) => {
     if (!window.confirm('Delete this fictional post?')) return
     await deleteSocialPost(id)
+    setPosts(loadSocialPosts())
+  }
+
+  const duplicate = (post: SocialPost) => {
+    const now = new Date().toISOString()
+    saveSocialPost({ ...post, id: crypto.randomUUID(), createdAt: now, updatedAt: now })
     setPosts(loadSocialPosts())
   }
 
@@ -45,6 +52,7 @@ export function SocialPostListPage() {
                   <small>Updated {new Date(post.updatedAt).toLocaleDateString()}</small>
                 </Link>
                 <Link to={`/social-posts/${post.id}/edit`} className="text-button">Edit</Link>
+                <button type="button" className="icon-button" onClick={() => duplicate(post)} aria-label="Duplicate post draft"><Copy size={18} /></button>
                 <button type="button" className="icon-button danger-icon" onClick={() => void remove(post.id)} aria-label="Delete post"><Trash2 size={19} /></button>
               </div>
             ))}

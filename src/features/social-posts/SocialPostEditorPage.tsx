@@ -4,12 +4,14 @@ import type { FormEvent } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { deleteMedia, saveMedia } from '../../mediaDb'
 import { loadPeople } from '../../storage'
+import { instagramProfile, redditProfile } from '../people/identity'
 import { CropEditor } from '../media/CropEditor'
 import { MediaImage } from '../media/MediaImage'
 import { imageProcessingError, optimizeImage, validateImage } from '../media/imageProcessing'
 import type { ImagePurpose } from '../media/imageProcessing'
 import { loadSocialPost, loadSocialPosts, saveSocialPost } from './socialPostRepository'
 import type { InstagramPost, RedditPost, SocialPlatform, SocialPost, Theme } from './types'
+import { formatComments, parseComments } from './fictionalComments'
 
 interface CropJob {
   url: string
@@ -80,6 +82,8 @@ export function SocialPostEditorPage() {
   const [instagramProfileId, setInstagramProfileId] = useState(instagramExisting?.profileMediaId)
   const [instagramProfileUrl, setInstagramProfileUrl] = useState(instagramExisting?.profileImageUrl)
   const [instagramMainId, setInstagramMainId] = useState(instagramExisting?.mainMediaId)
+  const [instagramCarouselIds, setInstagramCarouselIds] = useState(instagramExisting?.carouselMediaIds ?? [])
+  const [instagramCommentText, setInstagramCommentText] = useState(formatComments(instagramExisting?.comments))
   const [caption, setCaption] = useState(instagramExisting?.caption ?? '')
   const [location, setLocation] = useState(instagramExisting?.location ?? '')
   const [music, setMusic] = useState(instagramExisting?.musicLabel ?? '')
@@ -105,6 +109,7 @@ export function SocialPostEditorPage() {
   const [redditUserId, setRedditUserId] = useState(redditExisting?.userMediaId)
   const [redditUserUrl, setRedditUserUrl] = useState(redditExisting?.userImageUrl)
   const [redditMainId, setRedditMainId] = useState(redditExisting?.mainMediaId)
+  const [redditCommentText, setRedditCommentText] = useState(formatComments(redditExisting?.comments))
   const [title, setTitle] = useState(redditExisting?.title ?? '')
   const [body, setBody] = useState(redditExisting?.body ?? '')
   const [age, setAge] = useState(redditExisting?.ageLabel ?? 'now')
@@ -116,6 +121,9 @@ export function SocialPostEditorPage() {
   const [shareLabel, setShareLabel] = useState(redditExisting?.shareLabel ?? 'Share')
   const [voteState, setVoteState] = useState(redditExisting?.voteState ?? 'neutral')
   const [edited, setEdited] = useState(redditExisting?.isEdited ?? false)
+  const [pinned, setPinned] = useState(redditExisting?.isPinned ?? false)
+  const [spoiler, setSpoiler] = useState(redditExisting?.isSpoiler ?? false)
+  const [contentWarning, setContentWarning] = useState(redditExisting?.contentWarning ?? '')
   const [showJoin, setShowJoin] = useState(redditExisting?.showJoinButton ?? true)
   const [showClose, setShowClose] = useState(redditExisting?.showCloseButton ?? true)
   const [showSearch, setShowSearch] = useState(redditExisting?.showSearchButton ?? true)
@@ -177,19 +185,23 @@ export function SocialPostEditorPage() {
     setInstagramPersonId(personId)
     const person = people.find((item) => item.id === personId)
     if (!person) return
-    setHandle(person.handle || person.name.toLowerCase().replace(/\s+/g, '_'))
-    setDisplayName(person.name)
+    const profile = instagramProfile(person)
+    setHandle(profile.handle)
+    setDisplayName(profile.displayName)
     setInstagramProfileId(undefined)
-    setInstagramProfileUrl(person.photoUrl)
+    setInstagramProfileUrl(profile.photoUrl)
+    setVerified(profile.verified)
   }
 
   const chooseRedditPerson = (personId: string) => {
     setRedditPersonId(personId)
     const person = people.find((item) => item.id === personId)
     if (!person) return
-    setUsername(person.handle || person.name.toLowerCase().replace(/\s+/g, '_'))
+    const profile = redditProfile(person)
+    setUsername(profile.username)
     setRedditUserId(undefined)
-    setRedditUserUrl(person.photoUrl)
+    setRedditUserUrl(profile.photoUrl)
+    if (profile.defaultCommunity) setSubreddit(profile.defaultCommunity)
   }
 
   const submit = async (event: FormEvent) => {
@@ -203,10 +215,11 @@ export function SocialPostEditorPage() {
         personId: instagramPersonId || undefined,
         handle: handle.trim().replace(/^@/, ''), displayName: displayName.trim() || undefined,
         profileMediaId: instagramProfileId, profileImageUrl: instagramProfileUrl,
-        mainMediaId: instagramMainId, caption: caption.trim(),
+        mainMediaId: instagramMainId, carouselMediaIds: instagramCarouselIds, caption: caption.trim(),
         location: location.trim() || undefined, musicLabel: music.trim() || undefined,
         displayedDate: displayedDate.trim() || undefined, likeCount: likes, commentCount: instagramComments,
         repostCount: reposts, sendCount: sends, isSaved: savedPost, isVerified: verified,
+        comments: parseComments(instagramCommentText),
         showHeader, showFollowButton: showFollow, showEngagement, showCaption, showDate, showMusic,
       } satisfies InstagramPost
     } else {
@@ -217,10 +230,13 @@ export function SocialPostEditorPage() {
         personId: redditPersonId || undefined,
         username: username.trim().replace(/^u\//, ''), userMediaId: redditUserId,
         userImageUrl: redditUserUrl, ageLabel: age,
-        isEdited: edited, title: title.trim(), body: body.trim() || undefined, mainMediaId: redditMainId,
+        isEdited: edited, isPinned: pinned, isSpoiler: spoiler,
+        contentWarning: contentWarning.trim() || undefined,
+        title: title.trim(), body: body.trim() || undefined, mainMediaId: redditMainId,
         postFlair: flair.trim() ? { text: flair.trim(), backgroundColor: flairBackground, textColor: '#ffffff' } : undefined,
         voteCount: votes, commentCount: redditComments, repostCount: redditReposts, shareLabel,
-        voteState, showJoinButton: showJoin, showCloseButton: showClose, showSearchButton: showSearch,
+        voteState, comments: parseComments(redditCommentText),
+        showJoinButton: showJoin, showCloseButton: showClose, showSearchButton: showSearch,
         showFilterButton: showFilter, showOverflowButton: showOverflow, showSubredditIcon,
         showCommentComposer: showComposer, commentPlaceholder, showGifButton: showGif,
         showComposerImageButton: showComposerImage, showComposerCollapseButton: showComposerCollapse,
@@ -229,13 +245,13 @@ export function SocialPostEditorPage() {
     saveSocialPost(post)
     const postMedia = new Set(
       post.platform === 'instagram'
-        ? [post.profileMediaId, post.mainMediaId].filter(Boolean)
+        ? [post.profileMediaId, post.mainMediaId, ...(post.carouselMediaIds ?? [])].filter(Boolean)
         : [post.subredditMediaId, post.userMediaId, post.mainMediaId].filter(Boolean),
     )
     const unusedPending = [...pendingMedia.current].filter((id) => !postMedia.has(id))
     const previousMedia = existing
       ? existing.platform === 'instagram'
-        ? [existing.profileMediaId, existing.mainMediaId]
+        ? [existing.profileMediaId, existing.mainMediaId, ...(existing.carouselMediaIds ?? [])]
         : [existing.subredditMediaId, existing.userMediaId, existing.mainMediaId]
       : []
     const otherMedia = new Set(
@@ -243,7 +259,7 @@ export function SocialPostEditorPage() {
         .filter((item) => item.id !== id)
         .flatMap((item) =>
           item.platform === 'instagram'
-            ? [item.profileMediaId, item.mainMediaId]
+            ? [item.profileMediaId, item.mainMediaId, ...(item.carouselMediaIds ?? [])]
             : [item.subredditMediaId, item.userMediaId, item.mainMediaId],
         )
         .filter(Boolean),
@@ -282,6 +298,14 @@ export function SocialPostEditorPage() {
               </fieldset>
               <fieldset><legend>Post</legend>
                 <MediaPicker label="Main photo *" mediaId={instagramMainId} crop onFile={(file) => selectFile(file, true, setInstagramMainId)} />
+                <MediaPicker label="Add carousel photo" crop onFile={(file) => selectFile(file, true, (id) => setInstagramCarouselIds((current) => [...current, id]))} />
+                {instagramCarouselIds.length > 0 && (
+                  <div className="carousel-editor-list">
+                    {instagramCarouselIds.map((id, index) => (
+                      <div key={id}><MediaImage mediaId={id} alt={`Carousel item ${index + 2}`} /><button type="button" onClick={() => setInstagramCarouselIds((current) => current.filter((item) => item !== id))}>Remove</button></div>
+                    ))}
+                  </div>
+                )}
                 <label><span>Caption</span><textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={4} /></label>
                 <div className="form-grid"><label><span>Location</span><input value={location} onChange={(e) => setLocation(e.target.value)} /></label><label><span>Music label</span><input value={music} onChange={(e) => setMusic(e.target.value)} /></label></div>
                 <label><span>Displayed date</span><input value={displayedDate} onChange={(e) => setDisplayedDate(e.target.value)} /></label>
@@ -289,6 +313,7 @@ export function SocialPostEditorPage() {
               <fieldset><legend>Engagement</legend>
                 <div className="form-grid counts-grid"><label><span>Likes</span><input value={likes} onChange={(e) => setLikes(e.target.value)} /></label><label><span>Comments</span><input value={instagramComments} onChange={(e) => setInstagramComments(e.target.value)} /></label><label><span>Reposts</span><input value={reposts} onChange={(e) => setReposts(e.target.value)} /></label><label><span>Sends</span><input value={sends} onChange={(e) => setSends(e.target.value)} /></label></div>
                 <Toggle label="Saved/bookmarked" checked={savedPost} onChange={setSavedPost} />
+                <label><span>Fictional comments</span><textarea value={instagramCommentText} onChange={(e) => setInstagramCommentText(e.target.value)} rows={5} placeholder={'alex | Love this | 2h | 12\n> sam | Me too | 1h | 3'} /><small>One per line: author | comment | age | likes. Start replies with &gt;.</small></label>
               </fieldset>
               <fieldset><legend>Appearance</legend><label><span>Theme</span><select value={theme} onChange={(e) => setTheme(e.target.value as Theme)}><option value="dark">Dark</option><option value="light">Light</option></select></label>
                 <div className="toggle-grid"><Toggle label="Navigation header" checked={showHeader} onChange={setShowHeader} /><Toggle label="Engagement row" checked={showEngagement} onChange={setShowEngagement} /><Toggle label="Caption" checked={showCaption} onChange={setShowCaption} /><Toggle label="Date" checked={showDate} onChange={setShowDate} /><Toggle label="Music label" checked={showMusic} onChange={setShowMusic} /></div>
@@ -304,17 +329,20 @@ export function SocialPostEditorPage() {
               <fieldset><legend>Author</legend>
                 <label><span>Use person</span><select value={redditPersonId} onChange={(e) => chooseRedditPerson(e.target.value)}><option value="">Custom author</option>{people.map((person) => <option key={person.id} value={person.id}>{person.name}{person.handle ? ` (u/${person.handle})` : ''}</option>)}</select></label>
                 <div className="form-grid"><label><span>Username *</span><input value={username} onChange={(e) => setUsername(e.target.value)} /></label><label><span>Age</span><input value={age} onChange={(e) => setAge(e.target.value)} placeholder="4h" /></label></div>
-                <MediaPicker label="User avatar" mediaId={redditUserId} fallbackUrl={redditUserUrl} onFile={(file) => { setRedditPersonId(''); setRedditUserUrl(undefined); selectFile(file, false, setRedditUserId) }} /><Toggle label="Edited indicator" checked={edited} onChange={setEdited} />
+                <MediaPicker label="User avatar" mediaId={redditUserId} fallbackUrl={redditUserUrl} onFile={(file) => { setRedditPersonId(''); setRedditUserUrl(undefined); selectFile(file, false, setRedditUserId) }} />
+                <div className="toggle-grid"><Toggle label="Edited indicator" checked={edited} onChange={setEdited} /><Toggle label="Pinned post" checked={pinned} onChange={setPinned} /><Toggle label="Spoiler" checked={spoiler} onChange={setSpoiler} /></div>
               </fieldset>
               <fieldset><legend>Content</legend>
                 <label><span>Title *</span><textarea value={title} onChange={(e) => setTitle(e.target.value)} rows={3} /></label>
                 <label><span>Body</span><textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} /></label>
                 <MediaPicker label="Body image" mediaId={redditMainId} crop onFile={(file) => selectFile(file, true, setRedditMainId)} />
+                <label><span>Content warning</span><input value={contentWarning} onChange={(e) => setContentWarning(e.target.value)} placeholder="Optional warning label" /></label>
                 <div className="form-grid"><label><span>Post flair</span><input value={flair} onChange={(e) => setFlair(e.target.value)} /></label><label><span>Flair color</span><input type="color" value={flairBackground} onChange={(e) => setFlairBackground(e.target.value)} /></label></div>
               </fieldset>
               <fieldset><legend>Engagement</legend>
                 <div className="form-grid counts-grid"><label><span>Votes</span><input value={votes} onChange={(e) => setVotes(e.target.value)} /></label><label><span>Comments</span><input value={redditComments} onChange={(e) => setRedditComments(e.target.value)} /></label><label><span>Reposts</span><input value={redditReposts} onChange={(e) => setRedditReposts(e.target.value)} /></label><label><span>Share label</span><input value={shareLabel} onChange={(e) => setShareLabel(e.target.value)} /></label></div>
                 <label><span>Vote state</span><select value={voteState} onChange={(e) => setVoteState(e.target.value as NonNullable<RedditPost['voteState']>)}><option value="neutral">Neutral</option><option value="up">Upvoted</option><option value="down">Downvoted</option></select></label>
+                <label><span>Comment thread</span><textarea value={redditCommentText} onChange={(e) => setRedditCommentText(e.target.value)} rows={7} placeholder={'alex | Top-level comment | 2h | 12\n> sam | Reply to Alex | 1h | 3'} /><small>One per line: author | comment | age | votes. Start replies with &gt;.</small></label>
               </fieldset>
               <fieldset><legend>Composer</legend>
                 <label><span>Placeholder</span><input value={commentPlaceholder} onChange={(e) => setCommentPlaceholder(e.target.value)} /></label>

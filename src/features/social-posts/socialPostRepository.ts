@@ -31,7 +31,7 @@ export function replaceSocialPosts(posts: SocialPost[]) {
 
 function mediaIds(post: SocialPost) {
   return post.platform === 'instagram'
-    ? [post.profileMediaId, post.mainMediaId]
+    ? [post.profileMediaId, post.mainMediaId, ...(post.carouselMediaIds ?? [])]
     : [post.subredditMediaId, post.userMediaId, post.mainMediaId]
 }
 
