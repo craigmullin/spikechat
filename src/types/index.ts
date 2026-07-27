@@ -1,6 +1,7 @@
 export interface Person {
   id: string
   name: string
+  handle?: string
   photoUrl?: string
   status?: string
 }

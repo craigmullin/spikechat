@@ -10,9 +10,17 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { MediaImage } from '../../media/MediaImage'
+import { loadPeople } from '../../../storage'
 import type { InstagramPost } from '../types'
 
 export function InstagramPostPreview({ post }: { post: InstagramPost }) {
+  const person = post.personId
+    ? loadPeople().find((item) => item.id === post.personId)
+    : undefined
+  const handle = person?.handle || post.handle
+  const displayName = person?.name || post.displayName
+  const profileUrl = person?.photoUrl || post.profileImageUrl
+
   return (
     <article className={`social-preview instagram-preview ${post.theme}`}>
       {post.showHeader && (
@@ -24,11 +32,11 @@ export function InstagramPostPreview({ post }: { post: InstagramPost }) {
       )}
       <div className="instagram-account-row">
         <div className="social-avatar">
-          <MediaImage mediaId={post.profileMediaId} alt={`${post.handle} profile`} />
+          <MediaImage mediaId={post.profileMediaId} fallbackUrl={profileUrl} alt={`${handle} profile`} />
         </div>
         <div className="instagram-account-copy">
-          <strong>{post.handle || 'your_handle'} {post.isVerified && <ShieldCheck size={14} />}</strong>
-          {post.displayName && <span>{post.displayName}</span>}
+          <strong>{handle || 'your_handle'} {post.isVerified && <ShieldCheck size={14} />}</strong>
+          {displayName && <span>{displayName}</span>}
           {post.location && <span>{post.location}</span>}
           {post.showMusic && post.musicLabel && <span><Music2 size={12} /> {post.musicLabel}</span>}
         </div>
@@ -46,7 +54,7 @@ export function InstagramPostPreview({ post }: { post: InstagramPost }) {
         </div>
       )}
       {post.showCaption && post.caption && (
-        <p className="instagram-caption"><strong>{post.handle || 'your_handle'}</strong> {post.caption}</p>
+        <p className="instagram-caption"><strong>{handle || 'your_handle'}</strong> {post.caption}</p>
       )}
       {post.showDate && post.displayedDate && <p className="social-date">{post.displayedDate}</p>}
     </article>

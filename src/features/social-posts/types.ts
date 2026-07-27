@@ -11,9 +11,11 @@ interface BasePost {
 
 export interface InstagramPost extends BasePost {
   platform: 'instagram'
+  personId?: string
   handle: string
   displayName?: string
   profileMediaId?: string
+  profileImageUrl?: string
   mainMediaId: string
   caption: string
   location?: string
@@ -38,7 +40,9 @@ export interface RedditPost extends BasePost {
   subreddit: string
   subredditMediaId?: string
   username: string
+  personId?: string
   userMediaId?: string
+  userImageUrl?: string
   ageLabel?: string
   isEdited?: boolean
   title: string

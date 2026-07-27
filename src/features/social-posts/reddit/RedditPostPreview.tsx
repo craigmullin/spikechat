@@ -12,9 +12,16 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { MediaImage } from '../../media/MediaImage'
+import { loadPeople } from '../../../storage'
 import type { RedditPost } from '../types'
 
 export function RedditPostPreview({ post }: { post: RedditPost }) {
+  const person = post.personId
+    ? loadPeople().find((item) => item.id === post.personId)
+    : undefined
+  const username = person?.handle || post.username
+  const userImageUrl = person?.photoUrl || post.userImageUrl
+
   return (
     <article className={`social-preview reddit-preview ${post.theme}`}>
       <div className="reddit-topbar">
@@ -34,9 +41,9 @@ export function RedditPostPreview({ post }: { post: RedditPost }) {
       <div className="reddit-content">
         <div className="reddit-meta">
           <div className="reddit-user-avatar">
-            <MediaImage mediaId={post.userMediaId} alt={`${post.username} avatar`} />
+            <MediaImage mediaId={post.userMediaId} fallbackUrl={userImageUrl} alt={`${username} avatar`} />
           </div>
-          <span>u/{post.username || 'username'} · {post.ageLabel || 'now'}{post.isEdited ? ' · edited' : ''}</span>
+          <span>u/{username || 'username'} · {post.ageLabel || 'now'}{post.isEdited ? ' · edited' : ''}</span>
           {post.showJoinButton && <button type="button" className="join-button">Join</button>}
         </div>
         <h2>{post.title || 'Your post title'}</h2>

@@ -70,7 +70,11 @@ export function PeoplePage() {
 
                   <div className="person-card-details">
                     <strong>{person.name}</strong>
-                    <span>{person.status || 'Active now'}</span>
+                    <span>
+                      {person.handle
+                        ? `@${person.handle}${person.status ? ` · ${person.status}` : ''}`
+                        : person.status || 'Active now'}
+                    </span>
                   </div>
 
                   <MessageCircleMore size={21} />

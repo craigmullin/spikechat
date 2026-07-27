@@ -18,6 +18,7 @@ export function EditPersonPage() {
   )
 
   const [name, setName] = useState(existingPerson?.name ?? '')
+  const [handle, setHandle] = useState(existingPerson?.handle ?? '')
   const [status, setStatus] = useState(existingPerson?.status ?? 'Active now')
   const [photoUrl, setPhotoUrl] = useState(existingPerson?.photoUrl ?? '')
   const [imageError, setImageError] = useState('')
@@ -69,6 +70,7 @@ export function EditPersonPage() {
     const person: Person = {
       id: existingPerson?.id ?? crypto.randomUUID(),
       name: trimmedName,
+      handle: handle.trim().replace(/^@/, '') || undefined,
       status: status.trim() || 'Active now',
       photoUrl: photoUrl || undefined,
     }
@@ -181,6 +183,17 @@ export function EditPersonPage() {
               onChange={(event) => setName(event.target.value)}
               placeholder="Meaghan"
               autoFocus={!existingPerson}
+            />
+          </label>
+
+          <label>
+            <span>Handle</span>
+            <input
+              value={handle}
+              onChange={(event) => setHandle(event.target.value)}
+              placeholder="meaghan"
+              autoCapitalize="none"
+              spellCheck={false}
             />
           </label>
 

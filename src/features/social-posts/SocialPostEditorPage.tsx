@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { deleteMedia, saveMedia } from '../../mediaDb'
+import { loadPeople } from '../../storage'
 import { CropEditor } from '../media/CropEditor'
 import { MediaImage } from '../media/MediaImage'
 import { loadSocialPost, loadSocialPosts, saveSocialPost } from './socialPostRepository'
@@ -20,11 +21,13 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 function MediaPicker({
   label,
   mediaId,
+  fallbackUrl,
   crop = false,
   onFile,
 }: {
   label: string
   mediaId?: string
+  fallbackUrl?: string
   crop?: boolean
   onFile: (file: File, crop: boolean) => void
 }) {
@@ -32,8 +35,12 @@ function MediaPicker({
   return (
     <div className="social-media-field">
       <button type="button" className="media-picker-button" onClick={() => input.current?.click()}>
-        <span className="social-media-thumb">{mediaId ? <MediaImage mediaId={mediaId} alt={label} /> : <Camera size={24} />}</span>
-        <span><strong>{label}</strong><small>{mediaId ? 'Change image' : 'Choose image'}</small></span>
+        <span className="social-media-thumb">
+          {mediaId || fallbackUrl
+            ? <MediaImage mediaId={mediaId} fallbackUrl={fallbackUrl} alt={label} />
+            : <Camera size={24} />}
+        </span>
+        <span><strong>{label}</strong><small>{mediaId || fallbackUrl ? 'Change image' : 'Choose image'}</small></span>
       </button>
       <input
         ref={input}
@@ -56,6 +63,7 @@ export function SocialPostEditorPage() {
   const [params] = useSearchParams()
   const existing = useMemo(() => postId ? loadSocialPost(postId) : undefined, [postId])
   const platform = (existing?.platform ?? (params.get('platform') === 'reddit' ? 'reddit' : 'instagram')) as SocialPlatform
+  const people = useMemo(() => loadPeople(), [])
   const now = new Date().toISOString()
   const [theme, setTheme] = useState<Theme>(existing?.theme ?? 'dark')
   const [cropJob, setCropJob] = useState<CropJob>()
@@ -63,9 +71,11 @@ export function SocialPostEditorPage() {
   const saved = useRef(false)
 
   const instagramExisting = existing?.platform === 'instagram' ? existing : undefined
+  const [instagramPersonId, setInstagramPersonId] = useState(instagramExisting?.personId ?? '')
   const [handle, setHandle] = useState(instagramExisting?.handle ?? '')
   const [displayName, setDisplayName] = useState(instagramExisting?.displayName ?? '')
   const [instagramProfileId, setInstagramProfileId] = useState(instagramExisting?.profileMediaId)
+  const [instagramProfileUrl, setInstagramProfileUrl] = useState(instagramExisting?.profileImageUrl)
   const [instagramMainId, setInstagramMainId] = useState(instagramExisting?.mainMediaId)
   const [caption, setCaption] = useState(instagramExisting?.caption ?? '')
   const [location, setLocation] = useState(instagramExisting?.location ?? '')
@@ -85,10 +95,12 @@ export function SocialPostEditorPage() {
   const [showMusic, setShowMusic] = useState(instagramExisting?.showMusic ?? true)
 
   const redditExisting = existing?.platform === 'reddit' ? existing : undefined
+  const [redditPersonId, setRedditPersonId] = useState(redditExisting?.personId ?? '')
   const [subreddit, setSubreddit] = useState(redditExisting?.subreddit ?? '')
   const [username, setUsername] = useState(redditExisting?.username ?? '')
   const [redditCommunityId, setRedditCommunityId] = useState(redditExisting?.subredditMediaId)
   const [redditUserId, setRedditUserId] = useState(redditExisting?.userMediaId)
+  const [redditUserUrl, setRedditUserUrl] = useState(redditExisting?.userImageUrl)
   const [redditMainId, setRedditMainId] = useState(redditExisting?.mainMediaId)
   const [title, setTitle] = useState(redditExisting?.title ?? '')
   const [body, setBody] = useState(redditExisting?.body ?? '')
@@ -141,6 +153,25 @@ export function SocialPostEditorPage() {
     })
   }
 
+  const chooseInstagramPerson = (personId: string) => {
+    setInstagramPersonId(personId)
+    const person = people.find((item) => item.id === personId)
+    if (!person) return
+    setHandle(person.handle || person.name.toLowerCase().replace(/\s+/g, '_'))
+    setDisplayName(person.name)
+    setInstagramProfileId(undefined)
+    setInstagramProfileUrl(person.photoUrl)
+  }
+
+  const chooseRedditPerson = (personId: string) => {
+    setRedditPersonId(personId)
+    const person = people.find((item) => item.id === personId)
+    if (!person) return
+    setUsername(person.handle || person.name.toLowerCase().replace(/\s+/g, '_'))
+    setRedditUserId(undefined)
+    setRedditUserUrl(person.photoUrl)
+  }
+
   const submit = async (event: FormEvent) => {
     event.preventDefault()
     const id = existing?.id ?? crypto.randomUUID()
@@ -149,8 +180,10 @@ export function SocialPostEditorPage() {
       if (!handle.trim() || !instagramMainId) return
       post = {
         id, platform, createdAt: existing?.createdAt ?? now, updatedAt: now, theme,
+        personId: instagramPersonId || undefined,
         handle: handle.trim().replace(/^@/, ''), displayName: displayName.trim() || undefined,
-        profileMediaId: instagramProfileId, mainMediaId: instagramMainId, caption: caption.trim(),
+        profileMediaId: instagramProfileId, profileImageUrl: instagramProfileUrl,
+        mainMediaId: instagramMainId, caption: caption.trim(),
         location: location.trim() || undefined, musicLabel: music.trim() || undefined,
         displayedDate: displayedDate.trim() || undefined, likeCount: likes, commentCount: instagramComments,
         repostCount: reposts, sendCount: sends, isSaved: savedPost, isVerified: verified,
@@ -161,7 +194,9 @@ export function SocialPostEditorPage() {
       post = {
         id, platform, createdAt: existing?.createdAt ?? now, updatedAt: now, theme,
         subreddit: subreddit.trim().replace(/^r\//, ''), subredditMediaId: redditCommunityId,
-        username: username.trim().replace(/^u\//, ''), userMediaId: redditUserId, ageLabel: age,
+        personId: redditPersonId || undefined,
+        username: username.trim().replace(/^u\//, ''), userMediaId: redditUserId,
+        userImageUrl: redditUserUrl, ageLabel: age,
         isEdited: edited, title: title.trim(), body: body.trim() || undefined, mainMediaId: redditMainId,
         postFlair: flair.trim() ? { text: flair.trim(), backgroundColor: flairBackground, textColor: '#ffffff' } : undefined,
         voteCount: votes, commentCount: redditComments, repostCount: redditReposts, shareLabel,
@@ -216,11 +251,12 @@ export function SocialPostEditorPage() {
           {platform === 'instagram' ? (
             <>
               <fieldset><legend>Account</legend>
+                <label><span>Use person</span><select value={instagramPersonId} onChange={(e) => chooseInstagramPerson(e.target.value)}><option value="">Custom account</option>{people.map((person) => <option key={person.id} value={person.id}>{person.name}{person.handle ? ` (@${person.handle})` : ''}</option>)}</select></label>
                 <div className="form-grid">
                   <label><span>Handle *</span><input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="your_handle" /></label>
                   <label><span>Display name</span><input value={displayName} onChange={(e) => setDisplayName(e.target.value)} /></label>
                 </div>
-                <MediaPicker label="Profile image" mediaId={instagramProfileId} onFile={(file) => selectFile(file, false, setInstagramProfileId)} />
+                <MediaPicker label="Profile image" mediaId={instagramProfileId} fallbackUrl={instagramProfileUrl} onFile={(file) => { setInstagramPersonId(''); setInstagramProfileUrl(undefined); selectFile(file, false, setInstagramProfileId) }} />
                 <div className="toggle-grid"><Toggle label="Verified badge" checked={verified} onChange={setVerified} /><Toggle label="Follow button" checked={showFollow} onChange={setShowFollow} /></div>
               </fieldset>
               <fieldset><legend>Post</legend>
@@ -245,8 +281,9 @@ export function SocialPostEditorPage() {
                 <div className="toggle-grid"><Toggle label="Join button" checked={showJoin} onChange={setShowJoin} /><Toggle label="Community icon" checked={showSubredditIcon} onChange={setShowSubredditIcon} /></div>
               </fieldset>
               <fieldset><legend>Author</legend>
+                <label><span>Use person</span><select value={redditPersonId} onChange={(e) => chooseRedditPerson(e.target.value)}><option value="">Custom author</option>{people.map((person) => <option key={person.id} value={person.id}>{person.name}{person.handle ? ` (u/${person.handle})` : ''}</option>)}</select></label>
                 <div className="form-grid"><label><span>Username *</span><input value={username} onChange={(e) => setUsername(e.target.value)} /></label><label><span>Age</span><input value={age} onChange={(e) => setAge(e.target.value)} placeholder="4h" /></label></div>
-                <MediaPicker label="User avatar" mediaId={redditUserId} onFile={(file) => selectFile(file, false, setRedditUserId)} /><Toggle label="Edited indicator" checked={edited} onChange={setEdited} />
+                <MediaPicker label="User avatar" mediaId={redditUserId} fallbackUrl={redditUserUrl} onFile={(file) => { setRedditPersonId(''); setRedditUserUrl(undefined); selectFile(file, false, setRedditUserId) }} /><Toggle label="Edited indicator" checked={edited} onChange={setEdited} />
               </fieldset>
               <fieldset><legend>Content</legend>
                 <label><span>Title *</span><textarea value={title} onChange={(e) => setTitle(e.target.value)} rows={3} /></label>

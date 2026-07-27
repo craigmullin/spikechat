@@ -3,21 +3,29 @@ import { loadMedia } from '../../mediaDb'
 
 interface MediaImageProps {
   mediaId?: string
+  fallbackUrl?: string
   alt: string
   className?: string
 }
 
-export function MediaImage({ mediaId, alt, className }: MediaImageProps) {
+export function MediaImage({ mediaId, fallbackUrl, alt, className }: MediaImageProps) {
   const [url, setUrl] = useState<string>()
 
   useEffect(() => {
     let active = true
     let objectUrl: string | undefined
     setUrl(undefined)
-    if (!mediaId) return
+    if (!mediaId) {
+      setUrl(fallbackUrl)
+      return
+    }
 
     void loadMedia(mediaId).then((blob) => {
-      if (!blob || !active) return
+      if (!active) return
+      if (!blob) {
+        setUrl(fallbackUrl)
+        return
+      }
       objectUrl = URL.createObjectURL(blob)
       setUrl(objectUrl)
     })
@@ -26,7 +34,7 @@ export function MediaImage({ mediaId, alt, className }: MediaImageProps) {
       active = false
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
-  }, [mediaId])
+  }, [fallbackUrl, mediaId])
 
   if (!url) return <div className={`media-placeholder ${className ?? ''}`} aria-label={`${alt} unavailable`} />
   return <img className={className} src={url} alt={alt} draggable={false} />
