@@ -4,7 +4,7 @@ import { Navigate, useParams } from 'react-router-dom'
 import { ChatHeader } from '../components/ChatHeader'
 import { ChatInput } from '../components/ChatInput'
 import { MessageBubble } from '../components/MessageBubble'
-import { ImageCropper } from '../components/ImageCropper'
+import { CropEditor } from '../features/media/CropEditor'
 import { deleteMedia, loadMedia, saveMedia } from '../mediaDb'
 import {
   loadMessages,
@@ -37,7 +37,7 @@ export function ChatPage() {
   }, [messages])
 
   if (!person || !personId) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/people" replace />
   }
 
   const conversationMessages = messages
@@ -334,7 +334,7 @@ const handleSendImageMessage = async (
       )}
 
       {imageEditUrl && (
-        <ImageCropper
+        <CropEditor
           imageUrl={imageEditUrl}
           onCancel={() => {
             URL.revokeObjectURL(imageEditUrl)

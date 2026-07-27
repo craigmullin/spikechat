@@ -13,7 +13,7 @@ export function ChatHeader({ person }: ChatHeaderProps) {
     <header className="chat-header">
       <button
         className="icon-button"
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/people')}
         aria-label="Go back"
       >
         <ArrowLeft size={24} />

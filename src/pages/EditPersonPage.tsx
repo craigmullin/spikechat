@@ -99,7 +99,7 @@ export function EditPersonPage() {
     )
 
     savePeople(nextPeople)
-    navigate('/')
+    navigate('/people')
   }
 
   return (

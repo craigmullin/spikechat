@@ -1,4 +1,5 @@
 import {
+  ArrowLeft,
   MessageCircleMore,
   Pencil,
   Plus,
@@ -19,6 +20,9 @@ export function PeoplePage() {
   return (
     <div className="screen-shell">
       <header className="screen-header">
+        <Link to="/" className="icon-button" aria-label="Back to modes">
+          <ArrowLeft size={24} />
+        </Link>
         <div>
           <span className="eyebrow">SpikeChat</span>
           <h1>People</h1>

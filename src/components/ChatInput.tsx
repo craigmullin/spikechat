@@ -2,7 +2,7 @@ import { Image, Send, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import type { MessageDirection } from '../types'
-import { ImageCropper } from './ImageCropper'
+import { CropEditor } from '../features/media/CropEditor'
 
 interface ChatInputProps {
   onSendTextMessage: (
@@ -104,7 +104,7 @@ export function ChatInput({
   return (
     <div className="composer-wrapper">
       {cropSource && (
-        <ImageCropper
+        <CropEditor
           imageUrl={cropSource.url}
           onCancel={cancelCrop}
           onComplete={completeCrop}

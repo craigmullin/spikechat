@@ -1,32 +1,38 @@
-# React + TypeScript + Vite
+# SpikeChat Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+SpikeChat is a mobile-first, installable PWA for creating private fictional
+conversations and social-post mockups. Everything is stored locally in the
+browser; the app does not connect to Instagram, Reddit, or a messaging service.
 
-Currently, two official plugins are available:
+## Modes
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Chat: fictional text and image conversations
+- Instagram-style: editable photo-post mockups
+- Reddit-style: editable community-post mockups
 
-## React Compiler
+Images are stored as blobs in IndexedDB. People, messages, and post metadata are
+stored in local storage.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Development
 
-## Expanding the Oxlint configuration
+Node 22 is recommended (minimum `20.19`).
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run lint
+npm test
+npm run build
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Deployment
+
+Firebase Hosting serves the generated `dist` directory:
+
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+SpikeChat creates fictional content and does not scrape or call live social
+platform APIs. Use fictional identities and respect other people's privacy.
