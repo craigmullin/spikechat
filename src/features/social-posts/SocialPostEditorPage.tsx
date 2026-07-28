@@ -74,6 +74,9 @@ export function SocialPostEditorPage() {
   const [params] = useSearchParams()
   const existing = useMemo(() => postId ? loadSocialPost(postId) : undefined, [postId])
   const platform = (existing?.platform ?? (params.get('platform') === 'reddit' ? 'reddit' : 'instagram')) as SocialPlatform
+  const redditPresentation = existing?.platform === 'reddit'
+    ? existing.presentation ?? 'post'
+    : params.get('view') === 'card' ? 'card' : 'post'
   const instagramDefaults = useMemo(loadInstagramDefaults, [])
   const redditDefaults = useMemo(loadRedditDefaults, [])
   const people = useMemo(() => loadPeople(), [])
@@ -273,6 +276,7 @@ export function SocialPostEditorPage() {
       if (!subreddit.trim() || !username.trim() || !title.trim()) return
       post = {
         id, platform, createdAt: existing?.createdAt ?? now, updatedAt: now, theme,
+        presentation: redditPresentation,
         subreddit: subreddit.trim().replace(/^r\//, ''), communitySubtitle: communitySubtitle.trim() || undefined,
         subredditMediaId: redditCommunityId,
         personId: redditPersonId || undefined,
@@ -331,7 +335,7 @@ export function SocialPostEditorPage() {
     <div className="screen-shell social-editor-shell">
       <header className="screen-header compact-header sticky-editor-header">
         <button type="button" className="icon-button" onClick={() => navigate(-1)} aria-label="Go back"><ArrowLeft size={24} /></button>
-        <div><span className="eyebrow">{platform === 'instagram' ? 'Instagram-style' : 'Reddit-style'}</span><h1>{existing ? 'Edit Post' : 'New Post'}</h1></div>
+        <div><span className="eyebrow">{platform === 'instagram' ? 'Instagram-style' : redditPresentation === 'card' ? 'Reddit card' : 'Reddit post'}</span><h1>{existing ? 'Edit Post' : 'New Post'}</h1></div>
       </header>
       <main className="form-content">
         <form className="social-editor-form" onSubmit={submit}>
@@ -374,14 +378,14 @@ export function SocialPostEditorPage() {
             <>
               <fieldset><legend>Community</legend>
                 <label><span>Subreddit *</span><input value={subreddit} onChange={(e) => setSubreddit(e.target.value)} placeholder="community" /></label>
-                <label><span>Header subtitle</span><input value={communitySubtitle} onChange={(e) => setCommunitySubtitle(e.target.value)} placeholder="52.1k visitors per week" /></label>
+                {redditPresentation === 'post' && <label><span>Header subtitle</span><input value={communitySubtitle} onChange={(e) => setCommunitySubtitle(e.target.value)} placeholder="52.1k visitors per week" /></label>}
                 <MediaPicker label="Community icon" mediaId={redditCommunityId} onFile={(file) => selectFile(file, false, setRedditCommunityId)} />
                 <div className="toggle-grid"><Toggle label="Join button" checked={showJoin} onChange={setShowJoin} /><Toggle label="Community icon" checked={showSubredditIcon} onChange={setShowSubredditIcon} /></div>
               </fieldset>
               <fieldset><legend>Author</legend>
                 <label><span>Use person</span><select value={redditPersonId} onChange={(e) => chooseRedditPerson(e.target.value)}><option value="">Custom author</option>{people.map((person) => <option key={person.id} value={person.id}>{person.name}{person.handle ? ` (u/${person.handle})` : ''}</option>)}</select></label>
                 <div className="form-grid"><label><span>Username *</span><input value={username} onChange={(e) => setUsername(e.target.value)} /></label><label><span>Age</span><input value={age} onChange={(e) => setAge(e.target.value)} placeholder="4h" /></label></div>
-                <MediaPicker label="User avatar" mediaId={redditUserId} fallbackUrl={redditUserUrl} onFile={(file) => { setRedditPersonId(''); setRedditUserUrl(undefined); selectFile(file, false, setRedditUserId) }} />
+                {redditPresentation === 'post' && <MediaPicker label="User avatar" mediaId={redditUserId} fallbackUrl={redditUserUrl} onFile={(file) => { setRedditPersonId(''); setRedditUserUrl(undefined); selectFile(file, false, setRedditUserId) }} />}
                 <div className="toggle-grid"><Toggle label="Edited indicator" checked={edited} onChange={setEdited} /><Toggle label="Pinned post" checked={pinned} onChange={setPinned} /><Toggle label="Spoiler" checked={spoiler} onChange={setSpoiler} /><Toggle label="NSFW / 18+ label" checked={nsfw} onChange={setNsfw} /></div>
               </fieldset>
               <fieldset><legend>Content</legend>
@@ -395,16 +399,16 @@ export function SocialPostEditorPage() {
               <fieldset><legend>Engagement</legend>
                 <div className="form-grid counts-grid"><label><span>Votes</span><input value={votes} onChange={(e) => setVotes(e.target.value)} /></label><label><span>Comments</span><input value={redditComments} onChange={(e) => setRedditComments(e.target.value)} /></label><label><span>Reposts</span><input value={redditReposts} onChange={(e) => setRedditReposts(e.target.value)} /></label><label><span>Share label</span><input value={shareLabel} onChange={(e) => setShareLabel(e.target.value)} /></label></div>
                 <label><span>Vote state</span><select value={voteState} onChange={(e) => setVoteState(e.target.value as NonNullable<RedditPost['voteState']>)}><option value="neutral">Neutral</option><option value="up">Upvoted</option><option value="down">Downvoted</option></select></label>
-                <label><span>Comment thread</span><textarea value={redditCommentText} onChange={(e) => setRedditCommentText(e.target.value)} rows={7} placeholder={'alex | Top-level comment | 2h | 12\n> sam | Reply to Alex | 1h | 3'} /><small>One per line: author | comment | age | votes. Start replies with &gt;.</small></label>
+                {redditPresentation === 'post' && <label><span>Comment thread</span><textarea value={redditCommentText} onChange={(e) => setRedditCommentText(e.target.value)} rows={7} placeholder={'alex | Top-level comment | 2h | 12\n> sam | Reply to Alex | 1h | 3'} /><small>One per line: author | comment | age | votes. Start replies with &gt;.</small></label>}
               </fieldset>
-              <fieldset><legend>Composer</legend>
+              {redditPresentation === 'post' && <fieldset><legend>Composer</legend>
                 <label><span>Placeholder</span><input value={commentPlaceholder} onChange={(e) => setCommentPlaceholder(e.target.value)} /></label>
                 <div className="toggle-grid"><Toggle label="Comment composer" checked={showComposer} onChange={setShowComposer} /><Toggle label="GIF button" checked={showGif} onChange={setShowGif} /><Toggle label="Image button" checked={showComposerImage} onChange={setShowComposerImage} /><Toggle label="Collapse button" checked={showComposerCollapse} onChange={setShowComposerCollapse} /></div>
-              </fieldset>
+              </fieldset>}
               <fieldset><legend>Appearance</legend>
                 <label><span>Theme</span><select value={theme} onChange={(e) => setTheme(e.target.value as Theme)}><option value="dark">Dark</option><option value="light">Light</option></select></label>
-                <label><span>Inbox badge</span><input value={inboxBadge} onChange={(e) => setInboxBadge(e.target.value)} placeholder="4" /></label>
-                <div className="toggle-grid"><Toggle label="Back button" checked={showClose} onChange={setShowClose} /><Toggle label="Search button" checked={showSearch} onChange={setShowSearch} /><Toggle label="Header share button" checked={showHeaderShare} onChange={setShowHeaderShare} /><Toggle label="Extra filter button" checked={showFilter} onChange={setShowFilter} /><Toggle label="Author overflow button" checked={showOverflow} onChange={setShowOverflow} /><Toggle label="Bottom navigation" checked={showBottomNavigation} onChange={setShowBottomNavigation} /></div>
+                {redditPresentation === 'post' && <><label><span>Inbox badge</span><input value={inboxBadge} onChange={(e) => setInboxBadge(e.target.value)} placeholder="4" /></label>
+                <div className="toggle-grid"><Toggle label="Back button" checked={showClose} onChange={setShowClose} /><Toggle label="Search button" checked={showSearch} onChange={setShowSearch} /><Toggle label="Header share button" checked={showHeaderShare} onChange={setShowHeaderShare} /><Toggle label="Extra filter button" checked={showFilter} onChange={setShowFilter} /><Toggle label="Author overflow button" checked={showOverflow} onChange={setShowOverflow} /><Toggle label="Bottom navigation" checked={showBottomNavigation} onChange={setShowBottomNavigation} /></div></>}
               </fieldset>
             </>
           )}

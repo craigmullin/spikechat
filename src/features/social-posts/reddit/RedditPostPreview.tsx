@@ -28,7 +28,81 @@ function Comment({ comment, reply = false }: { comment: FictionalComment; reply?
   )
 }
 
+function RedditFeedCard({ post }: { post: RedditPost }) {
+  const person = post.personId
+    ? loadPeople().find((item) => item.id === post.personId)
+    : undefined
+  const identity = person ? redditProfile(person) : undefined
+  const username = identity?.username || post.username
+  const legacyNsfw = post.contentWarning?.trim().toUpperCase() === 'NSFW'
+  const showNsfw = post.isNsfw || legacyNsfw
+
+  return (
+    <article className={`social-preview reddit-preview reddit-feed-card ${post.theme}`}>
+      <header className="reddit-card-header">
+        {post.showSubredditIcon ? (
+          <div className="reddit-community-avatar">
+            {post.subredditMediaId
+              ? <MediaImage mediaId={post.subredditMediaId} alt={`r/${post.subreddit} icon`} />
+              : <span>r/</span>}
+          </div>
+        ) : <span />}
+        <div className="reddit-card-account">
+          <strong>r/{post.subreddit || 'community'}</strong>
+          <span>u/{username || 'username'} · {post.ageLabel || 'now'}{post.isEdited ? ' · edited' : ''}</span>
+        </div>
+        {post.showJoinButton && <button type="button" className="reddit-card-join">Join</button>}
+        {post.showOverflowButton && <MoreVertical size={22} />}
+      </header>
+
+      <div className="reddit-card-content">
+        {showNsfw && (
+          <div className="reddit-nsfw-row">
+            <span className="reddit-18-badge"><b>18</b></span>
+            <strong>{post.nsfwLabel || 'NSFW'}</strong>
+          </div>
+        )}
+        {post.postFlair?.text && (
+          <span
+            className="reddit-post-flair"
+            style={{
+              background: post.postFlair.backgroundColor || '#e72678',
+              color: post.postFlair.textColor || '#fff',
+            }}
+          >
+            {post.postFlair.text}
+          </span>
+        )}
+        <h1>{post.title || 'Your post title'}</h1>
+        {post.mainMediaId && <MediaImage mediaId={post.mainMediaId} alt="Post" className="reddit-card-image" />}
+        {post.body && <p className="reddit-body">{post.body}</p>}
+      </div>
+
+      <footer className="reddit-actions reddit-card-actions">
+        <div className={`reddit-action-group reddit-vote-group vote-${post.voteState ?? 'neutral'}`}>
+          <ArrowBigUp size={22} fill={post.voteState === 'up' ? 'currentColor' : 'none'} />
+          <strong>{post.voteCount || '0'}</strong>
+          <i />
+          <ArrowBigDown size={22} fill={post.voteState === 'down' ? 'currentColor' : 'none'} />
+        </div>
+        <div className="reddit-action-group">
+          <MessageCircle size={21} />
+          {post.commentCount || '0'}
+        </div>
+        <span className="reddit-action-spacer" />
+        <div className="reddit-action-group reddit-icon-action">
+          <Repeat2 size={20} />
+          {post.repostCount && <span>{post.repostCount}</span>}
+        </div>
+        <div className="reddit-action-group reddit-icon-action"><Share2 size={21} /></div>
+      </footer>
+    </article>
+  )
+}
+
 export function RedditPostPreview({ post }: { post: RedditPost }) {
+  if (post.presentation === 'card') return <RedditFeedCard post={post} />
+
   const person = post.personId
     ? loadPeople().find((item) => item.id === post.personId)
     : undefined

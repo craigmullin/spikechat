@@ -1,4 +1,4 @@
-import { Camera, HardDrive, MessageCircleMore, Radio } from 'lucide-react'
+import { Camera, HardDrive, LayoutList, MessageCircleMore, Radio } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function HomePage() {
@@ -20,7 +20,11 @@ export function HomePage() {
         </Link>
         <Link to="/social-posts?platform=reddit" className="mode-card mode-reddit">
           <Radio size={32} />
-          <div><strong>Reddit-style</strong><span>Create community posts</span></div>
+          <div><strong>Reddit post</strong><span>Create full posts with comments</span></div>
+        </Link>
+        <Link to="/social-posts?platform=reddit&view=card" className="mode-card mode-reddit-card">
+          <LayoutList size={32} />
+          <div><strong>Reddit card</strong><span>Create a scrollable feed card</span></div>
         </Link>
       </main>
       <footer className="home-footer">

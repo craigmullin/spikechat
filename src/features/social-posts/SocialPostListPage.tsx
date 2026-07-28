@@ -8,9 +8,20 @@ import type { SocialPlatform } from './types'
 export function SocialPostListPage() {
   const [params] = useSearchParams()
   const platform = (params.get('platform') === 'reddit' ? 'reddit' : 'instagram') as SocialPlatform
+  const redditPresentation = params.get('view') === 'card' ? 'card' : 'post'
   const [posts, setPosts] = useState(() => loadSocialPosts())
-  const filtered = useMemo(() => posts.filter((post) => post.platform === platform), [platform, posts])
-  const label = platform === 'instagram' ? 'Instagram-style' : 'Reddit-style'
+  const filtered = useMemo(
+    () => posts.filter((post) =>
+      post.platform === platform &&
+      (post.platform !== 'reddit' || (post.presentation ?? 'post') === redditPresentation)),
+    [platform, posts, redditPresentation],
+  )
+  const label = platform === 'instagram'
+    ? 'Instagram-style'
+    : redditPresentation === 'card' ? 'Reddit card' : 'Reddit post'
+  const newPostUrl = platform === 'reddit' && redditPresentation === 'card'
+    ? '/social-posts/new?platform=reddit&view=card'
+    : `/social-posts/new?platform=${platform}`
 
   const remove = async (id: string) => {
     if (!window.confirm('Delete this fictional post?')) return
@@ -32,7 +43,7 @@ export function SocialPostListPage() {
           <span className="eyebrow">SpikeChat Studio</span>
           <h1>{label}</h1>
         </div>
-        <Link to={`/social-posts/new?platform=${platform}`} className="primary-icon-button" aria-label={`Create ${label} post`}><Plus size={24} /></Link>
+        <Link to={newPostUrl} className="primary-icon-button" aria-label={`Create ${label}`}><Plus size={24} /></Link>
       </header>
       <main className="people-content">
         {filtered.length === 0 ? (
@@ -40,7 +51,7 @@ export function SocialPostListPage() {
             <div className="empty-icon">{platform === 'instagram' ? <Camera size={34} /> : <Radio size={34} />}</div>
             <h2>No posts yet</h2>
             <p>Create a fictional {label.toLowerCase()} post and preview it on a phone-sized canvas.</p>
-            <Link to={`/social-posts/new?platform=${platform}`} className="primary-button"><Plus size={18} />New Post</Link>
+            <Link to={newPostUrl} className="primary-button"><Plus size={18} />New Post</Link>
           </section>
         ) : (
           <div className="social-post-list">

@@ -820,12 +820,72 @@ button {
 .reaction-picker button { min-width: 42px; min-height: 38px; padding: 5px; border-radius: 10px; background: #272a31; color: white; }
 
 @media (min-width: 700px) {
-  .mode-grid { grid-template-columns: repeat(3, 1fr); }
+  .mode-grid { grid-template-columns: repeat(2, 1fr); }
   .mode-card { min-height: 175px; flex-direction: column; align-items: flex-start; }
   .mode-card > svg { width: 58px; height: 58px; }
   .phone-preview-wrap { padding: 20px; }
   .social-preview { border-radius: 28px; min-height: min(820px, calc(100dvh - 40px)); box-shadow: 0 24px 70px rgba(0,0,0,.45); }
 }
+
+.reddit-feed-card {
+  min-height: 0;
+  align-self: flex-start;
+  overflow: hidden;
+}
+.reddit-card-header {
+  padding: 16px 16px 10px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+}
+.reddit-community-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #272a2f;
+  color: #d8dadd;
+  font-size: 13px;
+  font-weight: 800;
+}
+.reddit-community-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.reddit-card-account { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.reddit-card-account strong,
+.reddit-card-account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reddit-card-account strong { font-size: 16px; }
+.reddit-card-account span { color: #a5a9b0; font-size: 14px; }
+.reddit-card-join {
+  min-height: 40px;
+  padding: 0 19px;
+  border-radius: 999px;
+  background: #f2f3f5;
+  color: #111;
+  font-size: 15px;
+  font-weight: 800;
+}
+.reddit-card-content { padding: 0 14px; }
+.reddit-card-content h1 {
+  margin: 10px 0 13px;
+  font-size: clamp(21px, 5.5vw, 26px);
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+.reddit-card-content .reddit-post-flair { margin: 7px 0 0; padding: 5px 9px; font-size: 13px; }
+.reddit-card-image {
+  width: 100%;
+  max-height: none;
+  display: block;
+  object-fit: contain;
+  background: #17191d;
+}
+.reddit-card-content .reddit-body { margin: 12px 2px 4px; }
+.reddit-card-actions { margin: 0; padding: 10px 14px 16px; }
+.reddit-card-actions .reddit-icon-action:has(span) { width: auto; padding: 0 12px; }
+.social-preview.light .reddit-card-account span { color: #62666e; }
+.social-preview.light .reddit-card-join { background: #111; color: #fff; }
 
 /* The general desktop shell is intentionally fixed for chat. Editors must
    remain independently scrollable regardless of viewport width. */

@@ -49,6 +49,7 @@ export interface InstagramPost extends BasePost {
 
 export interface RedditPost extends BasePost {
   platform: 'reddit'
+  presentation?: 'post' | 'card'
   subreddit: string
   communitySubtitle?: string
   subredditMediaId?: string
