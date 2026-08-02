@@ -12,6 +12,7 @@ import { LandingPage } from './pages/LandingPage'
 import { AboutPage } from './pages/AboutPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
+import { NewChatPage } from './pages/NewChatPage'
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
       <Route path="/people" element={<PeoplePage />} />
       <Route path="/people/new" element={<EditPersonPage />} />
       <Route path="/people/:personId/edit" element={<EditPersonPage />} />
-      <Route path="/chat/new" element={<PeoplePage />} />
+      <Route path="/chat/new" element={<NewChatPage />} />
       <Route path="/chat/:personId" element={<ChatPage />} />
       <Route path="/social-posts" element={<SocialPostListPage />} />
       <Route path="/social-posts/new" element={<SocialPostEditorPage />} />

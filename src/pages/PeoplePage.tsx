@@ -5,7 +5,7 @@ import {
   Plus,
   UserRound,
 } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { loadMessages, loadPeople } from '../storage'
 import { loadSocialPosts } from '../features/social-posts/socialPostRepository'
@@ -13,7 +13,6 @@ import type { Person } from '../types'
 import { personInitials } from '../features/people/identity'
 
 export function PeoplePage() {
-  const isChatChooser = useLocation().pathname === '/chat/new'
   const [people, setPeople] = useState<Person[]>([])
 
   useEffect(() => {
@@ -28,7 +27,7 @@ export function PeoplePage() {
         </Link>
         <div>
           <span className="eyebrow">SpikeChat</span>
-          <h1>{isChatChooser ? 'New Chat' : 'People'}</h1>
+          <h1>People</h1>
         </div>
 
         <Link
@@ -47,17 +46,16 @@ export function PeoplePage() {
               <UserRound size={34} />
             </div>
 
-            <h2>Add someone to start</h2>
+            <h2>No people yet</h2>
             <p>Create a fictional person, then you’ll go straight to the conversation editor.</p>
 
             <Link to="/people/new" className="primary-button">
               <Plus size={18} />
-              Add New Person
+              New Person
             </Link>
           </section>
         ) : (
-          <section aria-label={isChatChooser ? 'Choose a person for this chat' : 'People'}>
-            {isChatChooser && <p className="people-instruction">Choose an existing person or add someone new.</p>}
+          <section aria-label="People">
             <div className="people-list">
             {people.map((person) => (
               <div key={person.id} className="person-card">

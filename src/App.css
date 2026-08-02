@@ -738,8 +738,7 @@ button {
 }
 .public-nav { width: min(1120px, calc(100% - 40px)); min-height: 76px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .public-brand { color: white; display: inline-flex; align-items: center; gap: 9px; font-size: 19px; font-weight: 800; text-decoration: none; letter-spacing: -.02em; }
-.brand-mark { width: 34px; height: 34px; position: relative; display: inline-flex; align-items: center; color: #f7f8fb; font-family: Georgia, "Times New Roman", serif; font-size: 29px; font-weight: 700; line-height: 1; }
-.brand-mark i { width: 7px; height: 16px; position: absolute; right: 0; bottom: 3px; background: #f06b24; clip-path: polygon(55% 0, 100% 0, 68% 39%, 100% 39%, 25% 100%, 43% 55%, 10% 55%); }
+.public-brand img { width: 28px; height: 28px; object-fit: contain; }
 .public-nav nav { display: flex; align-items: center; gap: 22px; }
 .public-nav nav a { color: #c2c7d2; text-decoration: none; font-weight: 650; }
 .public-nav nav .nav-launch { min-height: 42px; padding: 0 16px; border-radius: 12px; background: #4d79ff; color: white; display: inline-flex; align-items: center; }
@@ -767,8 +766,23 @@ button {
 .site-footer p span { color: #606671; }
 .site-footer-compact { width: min(100%, 620px); margin-top: 24px; padding-bottom: 0; }
 .mode-home { overflow-y: auto; }
-.people-instruction { margin: 0 0 14px; color: #9fa2aa; line-height: 1.5; }
 .screen-shell.person-editor-shell { overflow-y: auto; overscroll-behavior-y: contain; }
+.new-chat-shell { overflow-y: auto; overscroll-behavior-y: contain; }
+.new-chat-content { width: min(100%, 620px); margin: 0 auto; padding: 28px 18px 48px; }
+.new-chat-intro { padding: 12px 4px 25px; text-align: center; }
+.new-chat-intro .empty-icon { margin: 0 auto; }
+.new-chat-intro h2 { margin: 17px 0 7px; }
+.new-chat-intro p { max-width: 410px; margin: 0 auto; color: #9fa2aa; line-height: 1.5; }
+.new-chat-create-card { min-height: 92px; padding: 17px; border: 1px solid #3858bb; border-radius: 18px; background: linear-gradient(135deg, #1e3474, #17244e); color: white; display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.new-chat-create-card > span:last-child { display: flex; flex-direction: column; gap: 5px; }
+.new-chat-create-card small { color: #b9c8f3; line-height: 1.35; }
+.new-chat-action-icon { width: 46px; height: 46px; flex: none; border-radius: 14px; background: #4d79ff; display: grid; place-items: center; }
+.existing-people-section { margin-top: 30px; }
+.existing-people-section > h2 { margin: 0 0 13px; font-size: 17px; }
+.new-chat-person { width: 100%; border-radius: 16px; background: #1c1e23; }
+.no-existing-people { padding: 22px; border: 1px dashed #343841; border-radius: 16px; color: #858b96; display: flex; align-items: center; gap: 12px; }
+.no-existing-people svg { flex: none; }
+.no-existing-people p { margin: 0; line-height: 1.45; }
 
 @media (max-width: 760px) {
   .public-nav { width: min(100% - 28px, 1120px); }
