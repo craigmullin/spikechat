@@ -11,7 +11,7 @@ export function HomePage() {
         <p>Private, fictional chat and social-post mockups—all stored on this device.</p>
       </header>
       <main className="mode-grid">
-        <Link to="/people" className="mode-card mode-chat">
+        <Link to="/chat/new" className="mode-card mode-chat">
           <MessageCircleMore size={32} />
           <div><strong>Chat</strong><span>Build fictional conversations</span></div>
         </Link>

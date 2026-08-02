@@ -5,7 +5,7 @@ import {
   Plus,
   UserRound,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { loadMessages, loadPeople } from '../storage'
 import { loadSocialPosts } from '../features/social-posts/socialPostRepository'
@@ -13,6 +13,7 @@ import type { Person } from '../types'
 import { personInitials } from '../features/people/identity'
 
 export function PeoplePage() {
+  const isChatChooser = useLocation().pathname === '/chat/new'
   const [people, setPeople] = useState<Person[]>([])
 
   useEffect(() => {
@@ -22,18 +23,18 @@ export function PeoplePage() {
   return (
     <div className="screen-shell">
       <header className="screen-header">
-        <Link to="/" className="icon-button" aria-label="Back to modes">
+        <Link to="/studio" className="icon-button" aria-label="Back to studio">
           <ArrowLeft size={24} />
         </Link>
         <div>
           <span className="eyebrow">SpikeChat</span>
-          <h1>People</h1>
+          <h1>{isChatChooser ? 'New Chat' : 'People'}</h1>
         </div>
 
         <Link
           to="/people/new"
           className="primary-icon-button"
-          aria-label="Create person"
+          aria-label="Add a new person"
         >
           <Plus size={24} />
         </Link>
@@ -46,16 +47,18 @@ export function PeoplePage() {
               <UserRound size={34} />
             </div>
 
-            <h2>No people yet</h2>
-            <p>Create a person to start building a conversation.</p>
+            <h2>Add someone to start</h2>
+            <p>Create a fictional person, then you’ll go straight to the conversation editor.</p>
 
             <Link to="/people/new" className="primary-button">
               <Plus size={18} />
-              New Person
+              Add New Person
             </Link>
           </section>
         ) : (
-          <div className="people-list">
+          <section aria-label={isChatChooser ? 'Choose a person for this chat' : 'People'}>
+            {isChatChooser && <p className="people-instruction">Choose an existing person or add someone new.</p>}
+            <div className="people-list">
             {people.map((person) => (
               <div key={person.id} className="person-card">
                 <Link
@@ -98,7 +101,8 @@ export function PeoplePage() {
                 </Link>
               </div>
             ))}
-          </div>
+            </div>
+          </section>
         )}
       </main>
     </div>

@@ -154,7 +154,7 @@ export function EditPersonPage() {
   }
 
   return (
-    <div className="screen-shell">
+    <div className="screen-shell person-editor-shell">
       <header className="screen-header compact-header">
         <button
           className="icon-button"

@@ -24,6 +24,7 @@ function App() {
       <Route path="/people" element={<PeoplePage />} />
       <Route path="/people/new" element={<EditPersonPage />} />
       <Route path="/people/:personId/edit" element={<EditPersonPage />} />
+      <Route path="/chat/new" element={<PeoplePage />} />
       <Route path="/chat/:personId" element={<ChatPage />} />
       <Route path="/social-posts" element={<SocialPostListPage />} />
       <Route path="/social-posts/new" element={<SocialPostEditorPage />} />
