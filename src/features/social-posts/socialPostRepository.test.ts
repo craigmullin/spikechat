@@ -46,6 +46,13 @@ const reddit: RedditPost = {
   showComposerImageButton: true, showComposerCollapseButton: true,
 }
 
+const redditCard: RedditPost = {
+  ...reddit,
+  id: 'reddit-card-1',
+  presentation: 'card',
+  title: 'A card title',
+}
+
 describe('socialPostRepository', () => {
   beforeEach(() => {
     values.clear()
@@ -61,6 +68,22 @@ describe('socialPostRepository', () => {
       platform: 'instagram',
       caption: 'Updated caption',
     })
+  })
+
+  it('reloads editable Instagram, Reddit post, and Reddit card records', () => {
+    saveSocialPost(instagram)
+    saveSocialPost(reddit)
+    saveSocialPost(redditCard)
+
+    saveSocialPost({ ...instagram, caption: 'Edited Instagram caption' })
+    saveSocialPost({ ...reddit, title: 'Edited Reddit post' })
+    saveSocialPost({ ...redditCard, title: 'Edited Reddit card' })
+
+    expect(loadSocialPost(instagram.id)).toMatchObject({ caption: 'Edited Instagram caption' })
+    expect(loadSocialPost(reddit.id)).toMatchObject({ title: 'Edited Reddit post' })
+    expect((loadSocialPost(reddit.id) as RedditPost).presentation ?? 'post').toBe('post')
+    expect(loadSocialPost(redditCard.id)).toMatchObject({ presentation: 'card', title: 'Edited Reddit card' })
+    expect(loadSocialPosts()).toHaveLength(3)
   })
 
   it('retains media referenced by another post', async () => {

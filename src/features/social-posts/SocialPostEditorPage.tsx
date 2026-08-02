@@ -77,6 +77,9 @@ export function SocialPostEditorPage() {
   const redditPresentation = existing?.platform === 'reddit'
     ? existing.presentation ?? 'post'
     : params.get('view') === 'card' ? 'card' : 'post'
+  const listUrl = platform === 'instagram'
+    ? '/social-posts?platform=instagram'
+    : `/social-posts?platform=reddit${redditPresentation === 'card' ? '&view=card' : ''}`
   const instagramDefaults = useMemo(loadInstagramDefaults, [])
   const redditDefaults = useMemo(loadRedditDefaults, [])
   const people = useMemo(() => loadPeople(), [])
@@ -334,7 +337,7 @@ export function SocialPostEditorPage() {
   return (
     <div className="screen-shell social-editor-shell">
       <header className="screen-header compact-header sticky-editor-header">
-        <button type="button" className="icon-button" onClick={() => navigate(-1)} aria-label="Go back"><ArrowLeft size={24} /></button>
+        <button type="button" className="icon-button" onClick={() => navigate(listUrl)} aria-label="Back to saved posts"><ArrowLeft size={24} /></button>
         <div><span className="eyebrow">{platform === 'instagram' ? 'Instagram-style' : redditPresentation === 'card' ? 'Reddit card' : 'Reddit post'}</span><h1>{existing ? 'Edit Post' : 'New Post'}</h1></div>
       </header>
       <main className="form-content">

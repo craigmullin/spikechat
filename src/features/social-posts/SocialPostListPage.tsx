@@ -38,7 +38,7 @@ export function SocialPostListPage() {
   return (
     <div className="screen-shell social-list-shell">
       <header className="screen-header">
-        <Link to="/" className="icon-button" aria-label="Back to modes"><ArrowLeft size={24} /></Link>
+        <Link to="/studio" className="icon-button" aria-label="Back to studio"><ArrowLeft size={24} /></Link>
         <div className="social-list-title">
           <span className="eyebrow">SpikeChat Studio</span>
           <h1>{label}</h1>

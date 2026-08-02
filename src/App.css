@@ -408,6 +408,8 @@ button {
 }
 
 .mode-home {
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   padding: max(38px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
@@ -418,6 +420,8 @@ button {
   color: white;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
 .mode-hero {
@@ -675,6 +679,9 @@ button {
   z-index: 30;
 }
 .preview-page-toolbar > div { justify-self: end; display: flex; }
+.preview-edit-button { min-height: 40px; padding: 0 14px; border-radius: 12px; }
+.preview-page-toolbar + .phone-preview-wrap { min-height: calc(100dvh - 64px); }
+.preview-page-toolbar + .phone-preview-wrap .social-preview { min-height: calc(100dvh - 64px); }
 .phone-preview-wrap {
   min-height: 100dvh;
   padding: 0;
@@ -765,7 +772,6 @@ button {
 .site-footer p { margin: 22px 0 0; }
 .site-footer p span { color: #606671; }
 .site-footer-compact { width: min(100%, 620px); margin-top: 24px; padding-bottom: 0; }
-.mode-home { overflow-y: auto; }
 .screen-shell.person-editor-shell { overflow-y: auto; overscroll-behavior-y: contain; }
 .new-chat-shell { overflow-y: auto; overscroll-behavior-y: contain; }
 .new-chat-content { width: min(100%, 620px); margin: 0 auto; padding: 28px 18px 48px; }
