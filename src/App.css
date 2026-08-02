@@ -728,6 +728,54 @@ button {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: #0b0c0d;
 }
+
+.public-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: #f7f8fb;
+  background: radial-gradient(circle at 82% 4%, rgba(77, 121, 255, .25), transparent 32%), radial-gradient(circle at 4% 60%, rgba(226, 64, 129, .11), transparent 28%), #08090c;
+  overflow-x: hidden;
+}
+.public-nav { width: min(1120px, calc(100% - 40px)); min-height: 76px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.public-brand { color: white; display: inline-flex; align-items: center; gap: 9px; font-size: 19px; font-weight: 800; text-decoration: none; letter-spacing: -.02em; }
+.public-brand svg { color: #6f90ff; }
+.public-nav nav { display: flex; align-items: center; gap: 22px; }
+.public-nav nav a { color: #c2c7d2; text-decoration: none; font-weight: 650; }
+.public-nav nav .nav-launch { min-height: 42px; padding: 0 16px; border-radius: 12px; background: #4d79ff; color: white; display: inline-flex; align-items: center; }
+.public-main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+.landing-hero { max-width: 880px; padding: clamp(80px, 13vw, 150px) 0 clamp(70px, 10vw, 120px); }
+.landing-hero h1 { margin: 13px 0 24px; font-size: clamp(44px, 7.3vw, 82px); line-height: 1.01; letter-spacing: -.055em; }
+.landing-hero > p:not(.landing-trust) { max-width: 720px; margin: 0 0 32px; color: #b3b9c6; font-size: clamp(18px, 2.1vw, 22px); line-height: 1.55; }
+.landing-cta { min-height: 54px; padding: 0 21px; border-radius: 15px; background: #4d79ff; color: white; display: inline-flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; box-shadow: 0 14px 34px rgba(77, 121, 255, .25); }
+.landing-trust { margin: 17px 0 0; color: #7e8592; font-size: 14px; }
+.use-grid { padding: 0 0 110px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.use-grid article { min-height: 220px; padding: 25px; border: 1px solid #282c35; border-radius: 22px; background: rgba(22, 24, 30, .78); }
+.use-grid svg { color: #7897ff; }
+.use-grid h2 { margin: 38px 0 9px; font-size: 19px; }
+.use-grid p { margin: 0; color: #969daa; line-height: 1.5; }
+.prose-page { max-width: 760px; padding: clamp(65px, 10vw, 110px) 0 100px; }
+.prose-page h1 { margin: 10px 0 25px; font-size: clamp(42px, 7vw, 66px); letter-spacing: -.045em; }
+.prose-page h2 { margin: 35px 0 10px; font-size: 22px; }
+.prose-page p, .prose-page li { color: #b8beca; font-size: 17px; line-height: 1.7; }
+.prose-page a { color: #89a4ff; }
+.policy-date { margin-top: -16px; color: #777e8b !important; font-size: 14px !important; }
+.site-footer { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 30px 0 max(35px, env(safe-area-inset-bottom)); border-top: 1px solid #292c33; color: #777e89; font-size: 13px; }
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 16px 24px; }
+.site-footer a { color: #a9afba; text-decoration: none; }
+.site-footer p { margin: 22px 0 0; }
+.site-footer p span { color: #606671; }
+.site-footer-compact { width: min(100%, 620px); margin-top: 24px; padding-bottom: 0; }
+.mode-home { overflow-y: auto; }
+
+@media (max-width: 760px) {
+  .public-nav { width: min(100% - 28px, 1120px); }
+  .public-main, .site-footer { width: min(100% - 36px, 1120px); }
+  .public-nav nav > a:first-child { display: none; }
+  .landing-hero { padding-top: 70px; }
+  .use-grid { grid-template-columns: 1fr; }
+  .use-grid article { min-height: 170px; }
+  .use-grid h2 { margin-top: 24px; }
+}
 .reddit-preview:not(.reddit-feed-card) {
   height: 100dvh;
   min-height: 0;

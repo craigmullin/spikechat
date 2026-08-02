@@ -8,11 +8,19 @@ import { SocialPostEditorPage } from './features/social-posts/SocialPostEditorPa
 import { SocialPostListPage } from './features/social-posts/SocialPostListPage'
 import { SocialPostPreviewPage } from './features/social-posts/SocialPostPreviewPage'
 import { BackupPage } from './features/backup/BackupPage'
+import { LandingPage } from './pages/LandingPage'
+import { AboutPage } from './pages/AboutPage'
+import { PrivacyPage } from './pages/PrivacyPage'
+import { TermsPage } from './pages/TermsPage'
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/studio" element={<HomePage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
       <Route path="/people" element={<PeoplePage />} />
       <Route path="/people/new" element={<EditPersonPage />} />
       <Route path="/people/:personId/edit" element={<EditPersonPage />} />

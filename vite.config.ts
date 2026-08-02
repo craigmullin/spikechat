@@ -17,14 +17,14 @@ export default defineConfig({
         name: 'SpikeChat',
         short_name: 'SpikeChat',
         description:
-          'Create fictional chat conversations with text, images, and more.',
+          'Create fictional conversation and social-post mockups for storytelling, education, design, and prototyping.',
 
         theme_color: '#111216',
         background_color: '#111216',
 
         display: 'standalone',
 
-        start_url: '/',
+        start_url: '/studio',
         scope: '/',
 
         icons: [

@@ -73,7 +73,7 @@ export function BackupPage() {
       await restoreBackup(pending)
       setPending(undefined)
       setMessage('Backup restored successfully.')
-      window.setTimeout(() => navigate('/'), 700)
+      window.setTimeout(() => navigate('/studio'), 700)
     } catch {
       setError('SpikeChat could not restore this backup. Existing metadata was not changed.')
     } finally {

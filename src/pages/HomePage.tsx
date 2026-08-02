@@ -1,5 +1,6 @@
 import { Camera, HardDrive, LayoutList, MessageCircleMore, Radio } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { SiteFooter } from '../components/SiteFooter'
 
 export function HomePage() {
   return (
@@ -31,6 +32,7 @@ export function HomePage() {
         <span className="local-note">No accounts. No feeds. Your work stays local.</span>
         <Link to="/data" className="data-link"><HardDrive size={17} />Data & Backup</Link>
       </footer>
+      <SiteFooter compact />
     </div>
   )
 }
