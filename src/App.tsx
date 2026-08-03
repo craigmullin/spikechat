@@ -13,6 +13,7 @@ import { AboutPage } from './pages/AboutPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
 import { NewChatPage } from './pages/NewChatPage'
+import { SnapchatEditorPage } from './features/snapchat/SnapchatEditorPage'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       <Route path="/people/:personId/edit" element={<EditPersonPage />} />
       <Route path="/chat/new" element={<NewChatPage />} />
       <Route path="/chat/:personId" element={<ChatPage />} />
+      <Route path="/snapchat" element={<SnapchatEditorPage />} />
       <Route path="/social-posts" element={<SocialPostListPage />} />
       <Route path="/social-posts/new" element={<SocialPostEditorPage />} />
       <Route path="/social-posts/:postId" element={<SocialPostPreviewPage />} />

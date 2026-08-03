@@ -1,6 +1,7 @@
-import { Camera, HardDrive, LayoutList, MessageCircleMore, Radio } from 'lucide-react'
+import { Camera, Ghost, HardDrive, LayoutList, MessageCircleMore, Radio } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { SiteFooter } from '../components/SiteFooter'
+import { featureVisibility } from '../features/featureVisibility'
 
 export function HomePage() {
   return (
@@ -23,9 +24,13 @@ export function HomePage() {
           <Radio size={32} />
           <div><strong>Reddit post</strong><span>Create full posts with comments</span></div>
         </Link>
-        <Link to="/social-posts?platform=reddit&view=card" className="mode-card mode-reddit-card">
+        <Link hidden={!featureVisibility.redditCard} to="/social-posts?platform=reddit&view=card" className="mode-card mode-reddit-card">
           <LayoutList size={32} />
           <div><strong>Reddit card</strong><span>Create a scrollable feed card</span></div>
+        </Link>
+        <Link hidden={!featureVisibility.snapchat} to="/snapchat" className="mode-card mode-snapchat">
+          <Ghost size={32} />
+          <div><strong>Snapchat-style</strong><span>Create photo captions</span></div>
         </Link>
       </main>
       <footer className="home-footer">
