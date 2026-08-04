@@ -40,7 +40,7 @@ export function SocialPostListPage() {
       <header className="screen-header">
         <Link to="/studio" className="icon-button" aria-label="Back to studio"><ArrowLeft size={24} /></Link>
         <div className="social-list-title">
-          <span className="eyebrow">SpikeChat Studio</span>
+          <span className="eyebrow">Chat Studio</span>
           <h1>{label}</h1>
         </div>
         <Link to={newPostUrl} className="primary-icon-button" aria-label={`Create ${label}`}><Plus size={24} /></Link>

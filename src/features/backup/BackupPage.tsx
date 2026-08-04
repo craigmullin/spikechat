@@ -43,7 +43,7 @@ export function BackupPage() {
       window.setTimeout(() => URL.revokeObjectURL(url), 1000)
       setMessage('Backup created. Keep the downloaded file somewhere safe.')
     } catch {
-      setError('SpikeChat could not create the backup.')
+      setError('Chat could not create the backup.')
     } finally {
       setBusy(false)
     }
@@ -75,7 +75,7 @@ export function BackupPage() {
       setMessage('Backup restored successfully.')
       window.setTimeout(() => navigate('/studio'), 700)
     } catch {
-      setError('SpikeChat could not restore this backup. Existing metadata was not changed.')
+      setError('Chat could not restore this backup. Existing metadata was not changed.')
     } finally {
       setBusy(false)
     }
@@ -88,7 +88,7 @@ export function BackupPage() {
           <ArrowLeft size={24} />
         </Link>
         <div>
-          <span className="eyebrow">SpikeChat Studio</span>
+          <span className="eyebrow">Chat Studio</span>
           <h1>Data & Backup</h1>
         </div>
       </header>
@@ -100,14 +100,14 @@ export function BackupPage() {
         </section>
 
         <section className="backup-card">
-          <div><Download size={24} /><div><h2>Export backup</h2><p>Download one file containing all SpikeChat data in this browser.</p></div></div>
+          <div><Download size={24} /><div><h2>Export backup</h2><p>Download one file containing all Chat data in this browser.</p></div></div>
           <button type="button" className="primary-button full-width-button" onClick={() => void exportBackup()} disabled={busy}>
             <Download size={18} />{busy ? 'Working…' : 'Download Backup'}
           </button>
         </section>
 
         <section className="backup-card">
-          <div><FileUp size={24} /><div><h2>Restore backup</h2><p>Choose a SpikeChat backup and review it before replacing local data.</p></div></div>
+          <div><FileUp size={24} /><div><h2>Restore backup</h2><p>Choose a Chat backup and review it before replacing local data.</p></div></div>
           <input ref={input} className="hidden-file-input" type="file" accept=".json,application/json" onChange={(event) => { void chooseBackup(event.target.files?.[0]); event.target.value = '' }} />
           <button type="button" className="secondary-action-button" onClick={() => input.current?.click()} disabled={busy}>
             <FileUp size={18} />Choose Backup File

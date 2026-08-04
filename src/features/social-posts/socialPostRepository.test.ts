@@ -38,7 +38,7 @@ const reddit: RedditPost = {
   id: 'reddit-1', platform: 'reddit',
   createdAt: '2026-07-27T00:00:00.000Z',
   updatedAt: '2026-07-27T00:00:00.000Z',
-  theme: 'dark', subreddit: 'SpikeChat', username: 'sample',
+  theme: 'dark', subreddit: 'Chat', username: 'sample',
   title: 'A title', mainMediaId: 'shared-image', showJoinButton: true,
   showCloseButton: true, showSearchButton: true, showFilterButton: true,
   showOverflowButton: true, showSubredditIcon: true,

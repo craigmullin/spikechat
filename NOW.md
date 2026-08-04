@@ -10,6 +10,8 @@ Last reviewed: 2026-08-04
 - Runtime: Node 22 recommended; minimum Node 20.19
 - Persistence: local storage and IndexedDB; no live social-platform APIs
 - Hosting: Firebase project/site `spikechat-e682a`
+- Canonical product name: Chat; the Firebase identifier remains a legacy
+  external identifier pending any separately approved migration.
 
 ## Recently verified
 

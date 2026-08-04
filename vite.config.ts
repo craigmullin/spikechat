@@ -13,8 +13,8 @@ export default defineConfig({
       ],
 
       manifest: {
-        name: 'SpikeChat',
-        short_name: 'SpikeChat',
+        name: 'Chat',
+        short_name: 'Chat',
         description:
           'Create fictional conversation and social-post mockups for storytelling, education, design, and prototyping.',
 

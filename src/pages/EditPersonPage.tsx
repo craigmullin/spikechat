@@ -165,7 +165,7 @@ export function EditPersonPage() {
         </button>
 
         <div>
-          <span className="eyebrow">SpikeChat</span>
+          <span className="eyebrow">Chat</span>
           <h1>{existingPerson ? 'Edit Person' : 'New Person'}</h1>
         </div>
       </header>

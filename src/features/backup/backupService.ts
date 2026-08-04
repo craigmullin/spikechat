@@ -77,7 +77,7 @@ export function parseBackupText(text: string): BackupPayload {
   }
 
   if (!value || typeof value !== 'object') {
-    throw new Error('This is not a SpikeChat backup.')
+    throw new Error('This is not a Chat backup.')
   }
 
   const backup = value as Partial<BackupPayload>
@@ -91,7 +91,7 @@ export function parseBackupText(text: string): BackupPayload {
     !Array.isArray(backup.media) ||
     typeof backup.exportedAt !== 'string'
   ) {
-    throw new Error('This SpikeChat backup is incomplete.')
+    throw new Error('This Chat backup is incomplete.')
   }
   if (
     backup.media.some(
