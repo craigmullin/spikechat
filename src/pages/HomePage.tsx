@@ -7,7 +7,7 @@ export function HomePage() {
   return (
     <div className="mode-home">
       <header className="mode-hero">
-        <span className="eyebrow">Chat Studio</span>
+        <span className="eyebrow">SpikeChat Studio</span>
         <h1>Create the conversation.</h1>
         <p>Private, fictional chat and social-post mockups—all stored on this device.</p>
       </header>

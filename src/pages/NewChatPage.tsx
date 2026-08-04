@@ -6,7 +6,7 @@ import { personInitials } from '../features/people/identity'
 export function NewChatPage() {
   const people = loadPeople().filter((person) => !person.archivedAt)
   return <div className="screen-shell new-chat-shell">
-    <header className="screen-header compact-header"><Link to="/studio" className="icon-button" aria-label="Back to studio"><ArrowLeft size={24} /></Link><div><span className="eyebrow">Chat</span><h1>New Chat</h1></div></header>
+    <header className="screen-header compact-header"><Link to="/studio" className="icon-button" aria-label="Back to studio"><ArrowLeft size={24} /></Link><div><span className="eyebrow">SpikeChat</span><h1>New Chat</h1></div></header>
     <main className="new-chat-content">
       <section className="new-chat-intro"><div className="empty-icon"><MessageCircleMore size={34} /></div><h2>Who is this conversation with?</h2><p>Choose someone you’ve already created or add a new fictional person.</p></section>
       <Link to="/people/new" className="new-chat-create-card"><span className="new-chat-action-icon"><Plus size={24} /></span><span><strong>Create a new person</strong><small>Set up their name, photo, status, and profile.</small></span></Link>

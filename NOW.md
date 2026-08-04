@@ -4,14 +4,14 @@ Last reviewed: 2026-08-04
 
 ## Stable baseline
 
-- Canonical remote: `git@github.com:craigmullin/chat.git`
+- Canonical remote: `git@github.com:craigmullin/spikechat.git`
 - Active branch: `develop`
 - Stack: React 19, TypeScript, Vite, Vitest, and Firebase Hosting
 - Runtime: Node 22 recommended; minimum Node 20.19
 - Persistence: local storage and IndexedDB; no live social-platform APIs
 - Hosting: Firebase project/site `spikechat-e682a`
-- Canonical product name: Chat; the Firebase identifier remains a legacy
-  external identifier pending any separately approved migration.
+- Canonical product name: SpikeChat; the Firebase identifier already matches
+  the restored product identity.
 
 ## Recently verified
 

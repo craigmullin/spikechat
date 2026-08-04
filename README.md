@@ -1,12 +1,12 @@
-# Chat
+# SpikeChat
 
-Chat is a mobile-first, installable PWA for creating private fictional
+SpikeChat is a mobile-first, installable PWA for creating private fictional
 conversations and social-post mockups. Everything is stored locally in the
 browser; the app does not connect to Instagram, Reddit, or a messaging service.
 
 ## Modes
 
-- Chat: fictional text and image conversations
+- SpikeChat: fictional text and image conversations
 - Instagram-style: editable photo-post mockups
 - Reddit-style: editable community-post mockups
 
@@ -34,15 +34,15 @@ npm run build
 firebase deploy --only hosting
 ```
 
-Chat creates fictional content and does not scrape or call live social
+SpikeChat creates fictional content and does not scrape or call live social
 platform APIs. Use fictional identities and respect other people's privacy.
 
 ## Repository and hosting
 
-- Canonical repository: `git@github.com:craigmullin/chat.git`
+- Canonical repository: `git@github.com:craigmullin/spikechat.git`
 - Development branch: `develop`
 - Firebase project and Hosting site: `spikechat-e682a`
 - Default Hosting URL: `https://spikechat-e682a.web.app`
 
-The legacy-named `spikechat.git` remote is retained for history verification. Do not
-archive it until the deployed PWA has been verified from the canonical source.
+The restored `spikechat.git` repository is canonical. Preserve dated backup
+refs until deployed history is fully verified.

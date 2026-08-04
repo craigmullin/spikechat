@@ -26,7 +26,7 @@ export function PeoplePage() {
           <ArrowLeft size={24} />
         </Link>
         <div>
-          <span className="eyebrow">Chat</span>
+          <span className="eyebrow">SpikeChat</span>
           <h1>People</h1>
         </div>
 

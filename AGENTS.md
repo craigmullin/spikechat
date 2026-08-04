@@ -1,8 +1,8 @@
-# Chat operating instructions
+# SpikeChat operating instructions
 
 ## Scope
 
-This repository owns the Chat browser application and PWA. Keep portfolio
+This repository owns the SpikeChat browser application and PWA. Keep portfolio
 coordination in HQ and reusable design-system decisions in Design.
 
 ## Before changes
