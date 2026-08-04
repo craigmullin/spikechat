@@ -768,6 +768,10 @@ button {
 .prose-page p, .prose-page li { color: #b8beca; font-size: 17px; line-height: 1.7; }
 .prose-page a { color: #89a4ff; }
 .policy-date { margin-top: -16px; color: #777e8b !important; font-size: 14px !important; }
+.experimental-tools { margin-top: 55px; color: #666d78; font-size: 13px; }
+.experimental-tools summary { width: fit-content; cursor: pointer; user-select: none; }
+.experimental-tools nav { margin-top: 13px; display: flex; flex-wrap: wrap; gap: 10px; }
+.experimental-tools nav a { padding: 8px 11px; border: 1px solid #30343c; border-radius: 10px; color: #8f96a2; text-decoration: none; }
 .site-footer { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 30px 0 max(35px, env(safe-area-inset-bottom)); border-top: 1px solid #292c33; color: #777e89; font-size: 13px; }
 .site-footer nav { display: flex; flex-wrap: wrap; gap: 16px 24px; }
 .site-footer a { color: #a9afba; text-decoration: none; }
@@ -775,14 +779,14 @@ button {
 .site-footer p span { color: #606671; }
 .site-footer-compact { width: min(100%, 620px); margin-top: 24px; padding-bottom: 0; }
 .screen-shell.person-editor-shell { overflow-y: auto; overscroll-behavior-y: contain; }
-.snapchat-editor-shell { overflow-y: auto; overscroll-behavior-y: contain; }
+.screen-shell.snapchat-editor-shell { overflow-y: auto; overscroll-behavior-y: contain; }
 .snapchat-editor-content { width: min(100%, 620px); margin: 0 auto; padding: 22px 18px 48px; display: grid; gap: 18px; }
 .snapchat-preview-card { min-height: 420px; border: 1px solid #292d35; border-radius: 22px; overflow: hidden; background: #0d0f13; display: grid; place-items: center; }
 .snapchat-canvas { width: 100%; position: relative; overflow: hidden; touch-action: none; }
 .snapchat-canvas > img { width: 100%; max-height: 72dvh; display: block; object-fit: contain; background: #000; }
-.snapchat-caption-strip { width: 100%; min-height: 48px; padding: 8px 14px; position: absolute; left: 0; transform: translateY(-50%); background: rgba(0, 0, 0, .48); color: #fff; cursor: grab; display: grid; place-items: center; touch-action: none; user-select: none; }
+.snapchat-caption-strip { width: 100%; padding: 2px 5px; position: absolute; left: 0; transform: translateY(-50%); background: rgba(0, 0, 0, .5); color: rgba(255, 255, 255, .82); cursor: grab; display: grid; place-items: center; touch-action: none; user-select: none; }
 .snapchat-caption-strip:active { cursor: grabbing; }
-.snapchat-caption-strip span { font-family: "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif; font-size: clamp(18px, 5vw, 28px); font-weight: 500; line-height: 1.2; text-align: center; overflow-wrap: anywhere; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.snapchat-caption-strip span { font-family: Roboto, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
 .snapchat-empty-preview { width: 100%; min-height: 420px; border: 0; background: transparent; color: #9096a1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; }
 .snapchat-empty-preview strong { margin-top: 5px; color: #e7e9ee; font-size: 18px; }
 .snapchat-controls { padding: 18px; border: 1px solid #2c3038; border-radius: 20px; background: #16181d; display: grid; gap: 15px; }

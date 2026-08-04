@@ -10,6 +10,7 @@ export function SnapchatEditorPage() {
   const fileInput = useRef<HTMLInputElement>(null)
   const preview = useRef<HTMLDivElement>(null)
   const image = useRef<HTMLImageElement>(null)
+  const dragOffset = useRef(0)
   const [imageUrl, setImageUrl] = useState('')
   const [caption, setCaption] = useState('')
   const [captionPosition, setCaptionPosition] = useState(DEFAULT_POSITION)
@@ -37,8 +38,16 @@ export function SnapchatEditorPage() {
   }
 
   const startDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const bounds = preview.current?.getBoundingClientRect()
+    if (!bounds) return
+    const currentY = bounds.top + bounds.height * captionPosition / 100
+    dragOffset.current = event.clientY - currentY
     event.currentTarget.setPointerCapture(event.pointerId)
-    moveCaption(event.clientY)
+  }
+
+  const dragCaption = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
+    moveCaption(event.clientY - dragOffset.current)
   }
 
   const exportImage = () => {
@@ -51,13 +60,13 @@ export function SnapchatEditorPage() {
     if (!context) return
     context.drawImage(source, 0, 0)
     if (caption.trim()) {
-      const fontSize = Math.max(24, Math.round(canvas.width * 0.052))
-      const stripHeight = fontSize * 1.75
+      const fontSize = Math.max(14, Math.round(canvas.width * (14 / 600)))
+      const stripHeight = fontSize * 1.4
       const centerY = canvas.height * captionPosition / 100
       context.fillStyle = 'rgba(0, 0, 0, 0.48)'
       context.fillRect(0, centerY - stripHeight / 2, canvas.width, stripHeight)
-      context.fillStyle = '#fff'
-      context.font = `500 ${fontSize}px "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif`
+      context.fillStyle = 'rgba(255, 255, 255, 0.82)'
+      context.font = `400 ${fontSize}px Roboto, Arial, sans-serif`
       context.textAlign = 'center'
       context.textBaseline = 'middle'
       const maxWidth = canvas.width * 0.92
@@ -73,13 +82,13 @@ export function SnapchatEditorPage() {
     <header className="screen-header compact-header sticky-editor-header"><Link to="/studio" className="icon-button" aria-label="Back to studio"><ArrowLeft size={24} /></Link><div><span className="eyebrow">Snapchat-style</span><h1>Create Snap</h1></div></header>
     <main className="snapchat-editor-content">
       <section className="snapchat-preview-card">
-        {imageUrl ? <div ref={preview} className="snapchat-canvas"><img ref={image} src={imageUrl} alt="Snap preview" />{caption.trim() && <div className="snapchat-caption-strip" style={{ top: `${captionPosition}%` }} onPointerDown={startDrag} onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) moveCaption(event.clientY) }}><span>{caption}</span></div>}</div> : <button type="button" className="snapchat-empty-preview" onClick={() => fileInput.current?.click()}><Camera size={40} /><strong>Choose a photo</strong><span>Start with a portrait or landscape image.</span></button>}
+        {imageUrl ? <div ref={preview} className="snapchat-canvas"><img ref={image} src={imageUrl} alt="Snap preview" />{caption.trim() && <div className="snapchat-caption-strip" style={{ top: `${captionPosition}%` }} onPointerDown={startDrag} onPointerMove={dragCaption}><span>{caption}</span></div>}</div> : <button type="button" className="snapchat-empty-preview" onClick={() => fileInput.current?.click()}><Camera size={40} /><strong>Choose a photo</strong><span>Start with a portrait or landscape image.</span></button>}
       </section>
       <section className="snapchat-controls">
         <input ref={fileInput} className="hidden-file-input" type="file" accept="image/*" onChange={(event) => void chooseImage(event)} />
         <button type="button" className="secondary-action-button" onClick={() => fileInput.current?.click()}><ImagePlus size={18} />{imageUrl ? 'Change photo' : 'Choose photo'}</button>
         <label><span>Caption</span><input type="text" value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Enter caption" maxLength={140} /></label>
-        <label><span>Caption position</span><input type="range" min="6" max="94" value={captionPosition} onChange={(event) => setCaptionPosition(Number(event.target.value))} /><small>Drag the caption on the photo or use this slider.</small></label>
+        {imageUrl && caption.trim() && <label><span>Caption position</span><input type="range" min="6" max="94" value={captionPosition} onChange={(event) => setCaptionPosition(Number(event.target.value))} /><small>Drag the caption strip or use this slider.</small></label>}
         {error && <p className="form-error" role="alert">{error}</p>}
         <button type="button" className="primary-button full-width-button" disabled={!imageUrl} onClick={exportImage}><Download size={18} />Download image</button>
       </section>
