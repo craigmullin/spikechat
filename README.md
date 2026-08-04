@@ -36,3 +36,13 @@ firebase deploy --only hosting
 
 SpikeChat creates fictional content and does not scrape or call live social
 platform APIs. Use fictional identities and respect other people's privacy.
+
+## Repository and hosting
+
+- Canonical repository: `git@github.com:craigmullin/chat.git`
+- Development branch: `develop`
+- Firebase project and Hosting site: `spikechat-e682a`
+- Default Hosting URL: `https://spikechat-e682a.web.app`
+
+The legacy `spikechat.git` remote is retained for history verification. Do not
+archive it until the deployed PWA has been verified from the canonical source.
