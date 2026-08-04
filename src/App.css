@@ -739,11 +739,16 @@ button {
 }
 
 .public-shell {
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   color: #f7f8fb;
   background: radial-gradient(circle at 82% 4%, rgba(77, 121, 255, .25), transparent 32%), radial-gradient(circle at 4% 60%, rgba(226, 64, 129, .11), transparent 28%), #08090c;
   overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .public-nav { width: min(1120px, calc(100% - 40px)); min-height: 76px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .public-brand { color: white; display: inline-flex; align-items: center; gap: 9px; font-size: 19px; font-weight: 800; text-decoration: none; letter-spacing: -.02em; }
